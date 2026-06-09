@@ -1,32 +1,42 @@
-// Las 2 cuentas pregeneradas para el proyecto
+// Cuentas predefinidas
 const cuentasValidas = {
-    "usuario1": "clave123",
-    "admin": "admin2026"
+usuario1: "clave123",
+admin: "admin2026"
 };
 
-// Esperar a que el HTML cargue para activar los controles
-document.addEventListener('DOMContentLoaded', () => {
-    const loginForm = document.getElementById('loginForm');
-    const mensajeDiv = document.getElementById('mensajeResultado');
+document.addEventListener("DOMContentLoaded", () => {
 
-    // Escucha obligatoria del botón de inicio de sesión
-    loginForm.addEventListener('submit', (event) => {
-        // CONSERVA la información en los inputs evitando que la página se reinicie
-        event.preventDefault(); 
+```
+const loginForm = document.getElementById("loginForm");
+const mensajeDiv = document.getElementById("mensajeResultado");
 
-        const usuarioIngresado = document.getElementById('username').value.trim();
-        const contrasenaIngresada = document.getElementById('password').value;
+loginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
 
-        // Limpiar estilos anteriores del mensaje
-        mensajeDiv.className = "message";
+    const usuario = document.getElementById("username").value.trim();
+    const contraseña = document.getElementById("password").value;
 
-        // Validación de credenciales
-        if (cuentasValidas[usuarioIngresado] && cuentasValidas[usuarioIngresado] === contrasenaIngresada) {
-            mensajeDiv.textContent = "Felicidades su cuenta se conectó perfectamente";
-            mensajeDiv.classList.add('success');
-        } else {
-            mensajeDiv.textContent = "Usuario o contraseña incorrectos.";
-            mensajeDiv.classList.add('error');
-        }
-    });
+    mensajeDiv.className = "message";
+
+    if (
+        cuentasValidas[usuario] &&
+        cuentasValidas[usuario] === contraseña
+    ) {
+        mensajeDiv.textContent =
+            "✅ Felicidades, su cuenta se conectó correctamente.";
+        mensajeDiv.classList.add("success");
+
+        // Redirección opcional después de 2 segundos
+        setTimeout(() => {
+            window.location.href = "inicio.html";
+        }, 2000);
+
+    } else {
+        mensajeDiv.textContent =
+            "❌ Usuario o contraseña incorrectos.";
+        mensajeDiv.classList.add("error");
+    }
+});
+```
+
 });
