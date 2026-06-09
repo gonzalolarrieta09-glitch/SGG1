@@ -1,47 +1,126 @@
-/* Título de registro */
-h3 {
-color: var(--text-dark);
-margin-top: 20px;
-margin-bottom: 20px;
+:root {
+    --bg-main: #1e293b;
+    --bg-card: #ffffff;
+    --text-dark: #111827;
+    --line-red: #ef4444;
+    --btn-bg: #111827;
+    --btn-hover: #374151;
+    --success-green: #22c55e;
 }
 
-/* Separador */
-hr {
-margin: 25px 0;
-border: none;
-border-top: 1px solid #d1d5db;
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #1e293b, #334155);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
 }
 
-/* Botón de tema */
+.login-container {
+    background-color: var(--bg-card);
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+h2, h3 {
+    color: var(--text-dark);
+}
+
+.input-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #d1d5db;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 15px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--line-red);
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background-color: var(--btn-bg);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--btn-hover);
+}
+
+.message {
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+.success {
+    color: var(--success-green);
+}
+
+.error {
+    color: var(--line-red);
+}
+
 .theme-btn {
-margin-bottom: 20px;
+    margin-bottom: 15px;
+}
+
+#registroContainer {
+    display: none;
+}
+
+hr {
+    margin: 25px 0;
 }
 
 /* Modo oscuro */
+
 body.dark-mode {
-background: linear-gradient(135deg, #0f172a, #020617);
+    background: linear-gradient(135deg, #0f172a, #020617);
 }
 
 body.dark-mode .login-container {
-background-color: #1f2937;
+    background-color: #1f2937;
 }
 
 body.dark-mode h2,
 body.dark-mode h3,
 body.dark-mode label {
-color: #ffffff;
+    color: white;
 }
 
 body.dark-mode input {
-background-color: #374151;
-color: white;
-border-color: #60a5fa;
+    background-color: #374151;
+    color: white;
+    border-color: #60a5fa;
 }
 
 body.dark-mode input::placeholder {
-color: #d1d5db;
-}
-
-body.dark-mode hr {
-border-top: 1px solid #4b5563;
+    color: #d1d5db;
 }
