@@ -22,18 +22,10 @@ loginForm.addEventListener("submit", (event) => {
         cuentasValidas[usuario] &&
         cuentasValidas[usuario] === contraseña
     ) {
-        mensajeDiv.textContent =
-            "✅ Felicidades, su cuenta se conectó correctamente.";
+        mensajeDiv.textContent = "Felicidades, su cuenta se conectó perfectamente.";
         mensajeDiv.classList.add("success");
-
-        // Redirección opcional después de 2 segundos
-        setTimeout(() => {
-            window.location.href = "inicio.html";
-        }, 2000);
-
     } else {
-        mensajeDiv.textContent =
-            "❌ Usuario o contraseña incorrectos.";
+        mensajeDiv.textContent = "Usuario o contraseña incorrectos.";
         mensajeDiv.classList.add("error");
     }
 });
