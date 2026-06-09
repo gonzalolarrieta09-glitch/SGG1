@@ -27,7 +27,30 @@ loginForm.addEventListener("submit", (event) => {
     } else {
         mensajeDiv.textContent = "Usuario o contraseña incorrectos.";
         mensajeDiv.classList.add("error");
-    }
+    }<h3>¿No tienes cuenta? Regístrate</h3>
+
+<form id="registroForm">
+    <div class="input-group">
+        <label for="nuevoUsuario">Usuario</label>
+        <input type="text" id="nuevoUsuario" required>
+    </div>
+
+```
+<div class="input-group">
+    <label for="correo">Correo electrónico</label>
+    <input type="email" id="correo" required>
+</div>
+
+<div class="input-group">
+    <label for="nuevaPassword">Contraseña</label>
+    <input type="password" id="nuevaPassword" required>
+</div>
+
+<button type="submit">Registrarse</button>
+```
+
+</form>
+
 });
 ```
 
