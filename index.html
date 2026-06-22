@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio de Sesión - Proyecto</title>
+    <title>Inicio de Sesión</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <main class="login-container">
 
-        <button id="themeToggle" class="theme-btn">
-            🌙 Cambiar tema
+        <button id="themeToggle" class="theme-btn" type="button">
+            🌙 Tema oscuro
         </button>
 
         <h2>Iniciar Sesión</h2>
@@ -24,8 +26,8 @@
                 <input
                     type="text"
                     id="username"
+                    placeholder="Ingrese su usuario"
                     required
-                    placeholder="Tu usuario"
                 >
             </div>
 
@@ -34,13 +36,13 @@
                 <input
                     type="password"
                     id="password"
+                    placeholder="Ingrese su contraseña"
                     required
-                    placeholder="Tu contraseña"
                 >
             </div>
 
             <button type="submit">
-                Conectarse
+                Ingresar
             </button>
 
         </form>
@@ -52,4 +54,5 @@
     <script src="login.js"></script>
 
 </body>
+
 </html>
