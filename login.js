@@ -9,25 +9,38 @@ document.addEventListener("DOMContentLoaded", () => {
     const mensajeDiv = document.getElementById("mensajeResultado");
     const themeToggle = document.getElementById("themeToggle");
 
-    // Cargar tema guardado
-    if (localStorage.getItem("tema") === "oscuro") {
+    // Aplicar tema guardado
+    const temaGuardado = localStorage.getItem("tema");
+
+    if (temaGuardado === "oscuro") {
         document.body.classList.add("dark-mode");
     }
 
-    // Cambiar tema
-    themeToggle.addEventListener("click", () => {
+    // Cambio de tema
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
 
-        document.body.classList.toggle("dark-mode");
+            document.body.classList.toggle("dark-mode");
 
+            if (document.body.classList.contains("dark-mode")) {
+                localStorage.setItem("tema", "oscuro");
+                themeToggle.textContent = "☀️ Tema claro";
+            } else {
+                localStorage.setItem("tema", "claro");
+                themeToggle.textContent = "🌙 Tema oscuro";
+            }
+
+        });
+
+        // Texto inicial del botón
         if (document.body.classList.contains("dark-mode")) {
-            localStorage.setItem("tema", "oscuro");
+            themeToggle.textContent = "☀️ Tema claro";
         } else {
-            localStorage.setItem("tema", "claro");
+            themeToggle.textContent = "🌙 Tema oscuro";
         }
+    }
 
-    });
-
-    // Login
+    // Inicio de sesión
     loginForm.addEventListener("submit", (event) => {
 
         event.preventDefault();
