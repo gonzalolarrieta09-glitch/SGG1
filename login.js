@@ -9,59 +9,49 @@ document.addEventListener("DOMContentLoaded", () => {
     const mensajeDiv = document.getElementById("mensajeResultado");
     const themeToggle = document.getElementById("themeToggle");
 
+    // Cargar tema guardado
+    if (localStorage.getItem("tema") === "oscuro") {
+        document.body.classList.add("dark-mode");
+    }
+
+    // Cambiar tema
+    themeToggle.addEventListener("click", () => {
+
+        document.body.classList.toggle("dark-mode");
+
+        if (document.body.classList.contains("dark-mode")) {
+            localStorage.setItem("tema", "oscuro");
+        } else {
+            localStorage.setItem("tema", "claro");
+        }
+
+    });
+
+    // Login
     loginForm.addEventListener("submit", (event) => {
 
         event.preventDefault();
 
-        const usuario =
-            document.getElementById("username").value.trim();
-
-        const contraseña =
-            document.getElementById("password").value;
+        const usuario = document.getElementById("username").value.trim();
+        const contraseña = document.getElementById("password").value;
 
         mensajeDiv.className = "message";
 
         if (!cuentasValidas[usuario]) {
 
-            mensajeDiv.textContent =
-                "❌ Usuario no registrado.";
-
+            mensajeDiv.textContent = "❌ Usuario no registrado.";
             mensajeDiv.classList.add("error");
 
-        } else if (
-            cuentasValidas[usuario] === contraseña
-        ) {
+        } else if (cuentasValidas[usuario] === contraseña) {
 
-            mensajeDiv.textContent =
-                "✅ Inicio de sesión correcto.";
-
+            mensajeDiv.textContent = "✅ Inicio de sesión correcto.";
             mensajeDiv.classList.add("success");
 
         } else {
 
-            mensajeDiv.textContent =
-                "❌ Contraseña incorrecta.";
-
+            mensajeDiv.textContent = "❌ Contraseña incorrecta.";
             mensajeDiv.classList.add("error");
 
-        }
-
-    });
-
-    if (localStorage.getItem("tema") === "oscuro") {
-        document.body.classList.add("dark-mode");
-    }
-
-    themeToggle.addEventListener("click", () => {
-
-        document.body.classList.toggle("dark-mode");
-
-        if (
-            document.body.classList.contains("dark-mode")
-        ) {
-            localStorage.setItem("tema", "oscuro");
-        } else {
-            localStorage.setItem("tema", "claro");
         }
 
     });
