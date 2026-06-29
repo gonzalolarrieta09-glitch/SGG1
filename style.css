@@ -2,11 +2,12 @@
     --bg-main: #1e293b;
     --bg-card: #ffffff;
     --text-dark: #111827;
-    --line-red: #ef4444;
+    --line-red: #dc2626;      
     --btn-bg: #111827;
     --btn-hover: #374151;
-    --success-green: #22c55e;
-    --border-color: #d1d5db;
+    --success-green: #15803d; 
+    --border-color: #737373;  
+    --link-color: #1d4ed8;    
 }
 
 body {
@@ -20,17 +21,20 @@ body {
     transition: background 0.3s ease;
 }
 
-/* Modo oscuro */
+/* Modo oscuro optimizado */
 body.dark-mode {
     background: linear-gradient(135deg, #0f172a, #020617);
 }
 body.dark-mode .login-container { background-color: #1f2937; }
-body.dark-mode h2, body.dark-mode label { color: white; }
-body.dark-mode input { background-color: #374151; color: white; border-color: #60a5fa; }
-body.dark-mode input::placeholder { color: #d1d5db; }
-body.dark-mode button:not(.toggle-password-btn) { background-color: #3b82f6; }
-body.dark-mode button:not(.toggle-password-btn):hover { background-color: #2563eb; }
-body.dark-mode .form-links a { color: #60a5fa; }
+body.dark-mode h2, body.dark-mode label { color: #ffffff; }
+body.dark-mode input { background-color: #374151; color: #ffffff; border-color: #93c5fd; }
+body.dark-mode input::placeholder { color: #e5e7eb; }
+body.dark-mode button:not(.toggle-password-btn) { background-color: #3b82f6; color: #ffffff; }
+body.dark-mode button:not(.toggle-password-btn):hover { background-color: #1d4ed8; }
+body.dark-mode .form-links a { color: #93c5fd; } 
+body.dark-mode .toggle-password-btn { color: #e5e7eb; }
+body.dark-mode .req-invalid { color: #ff8a8a; } /* Tono corregido para romper la barrera del +90 */
+body.dark-mode .req-valid { color: #4ade80; }
 
 .login-container {
     background-color: var(--bg-card);
@@ -64,7 +68,6 @@ h2 { color: var(--text-dark); margin-top: 5px; }
 .input-group { margin-bottom: 16px; text-align: left; }
 label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-dark); }
 
-/* Posicionamiento para ojito de password */
 .password-wrapper {
     position: relative;
     display: flex;
@@ -78,7 +81,8 @@ label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-
     border: none;
     cursor: pointer;
     font-size: 16px;
-    color: #6b7280;
+    color: #4b5563;
+    padding: 4px;
 }
 
 input {
@@ -89,7 +93,7 @@ input {
     box-sizing: border-box;
     font-size: 15px;
 }
-input:focus { outline: none; border-color: var(--line-red); }
+input:focus { outline: none; border-color: #3b82f6; }
 
 button:not(.toggle-password-btn) {
     width: 100%;
@@ -104,18 +108,20 @@ button:not(.toggle-password-btn) {
     font-size: 15px;
 }
 button:not(.toggle-password-btn):hover { background-color: var(--btn-hover); }
-button:disabled { background-color: #9ca3af !important; cursor: not-allowed; }
+button:disabled { 
+    background-color: #9ca3af !important; 
+    color: #111827 !important; /* Contraste robustecido para modo claro */
+    cursor: not-allowed; 
+}
 
-.form-links { margin-top: 20px; font-size: 14px; }
-.form-links a { color: #2563eb; text-decoration: none; font-weight: 600; }
-.form-links a:hover { text-decoration: underline; }
+.form-links { margin-top: 20px; font-size: 14px; color: inherit; }
+.form-links a { color: var(--link-color); text-decoration: underline; font-weight: 600; }
+.form-links a:hover { text-decoration: none; }
 
-/* Mensajes de Alerta */
 .message { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 24px; }
 .success { color: var(--success-green); }
 .error { color: var(--line-red); }
 
-/* Feedback UX Requisitos */
 .requirements-list {
     margin: 10px 0 5px 0;
     padding: 0;
@@ -127,7 +133,6 @@ button:disabled { background-color: #9ca3af !important; cursor: not-allowed; }
 .req-invalid { color: var(--line-red); }
 .req-valid { color: var(--success-green); }
 
-/* REGLA CENTRAL DE SPA: Ocultamiento Absoluto */
 .hidden {
     display: none !important;
 }
