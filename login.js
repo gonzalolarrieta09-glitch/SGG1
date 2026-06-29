@@ -1,171 +1,276 @@
-// Inicializar Base de Datos PMV en localStorage (Soporta usuario, contraseña y correo)
+// Base de datos simulada en localStorage
 if (!localStorage.getItem("cuentasSGG")) {
     const cuentasIniciales = {
-        usuario1: { password: "clave123", email: "usuario1@test.com" },
-        admin: { password: "admin2026", email: "admin@test.com" }
+        usuario1: { password: "Clave*123", email: "usuario1@empresa.com", nombre: "Juan", apellido: "Perez" },
+        admin: { password: "Admin*2026", email: "admin@corporativo.org", nombre: "Carlos", apellido: "SGG" }
     };
     localStorage.setItem("cuentasSGG", JSON.stringify(cuentasIniciales));
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
+    // Componentes del DOM Globales
     const themeToggle = document.getElementById("themeToggle");
     const mensajeDiv = document.getElementById("mensajeResultado");
+    const togglePasswordButtons = document.querySelectorAll(".toggle-password-btn");
 
-    // Formularios y Secciones
+    // Componentes de Secciones Unificadas
     const loginSection = document.getElementById("loginSection");
     const registerSection = document.getElementById("registerSection");
     const recoverSection = document.getElementById("recoverSection");
-    
-    const loginForm = document.getElementById("loginForm");
-    const registerForm = document.getElementById("registerForm");
-    const recoverForm = document.getElementById("recoverForm");
 
-    // Enlaces de navegación
+    // Enlaces de Navegación Interna
     const linkToRegister = document.getElementById("linkToRegister");
     const linkToRecover = document.getElementById("linkToRecover");
     const linksToLogin = document.querySelectorAll(".linkToLogin");
 
-    // --- RF-02: CAMBIO DE TEMA ---
-    const temaGuardado = localStorage.getItem("tema");
-    if (temaGuardado === "oscuro") {
+    // Formularios independientes
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const recoverForm = document.getElementById("recoverForm");
+
+    // ---- RF-02: CONTROL DE TEMA PERSISTENTE ----
+    if (localStorage.getItem("tema") === "oscuro") {
         document.body.classList.add("dark-mode");
+        if (themeToggle) themeToggle.textContent = "☀️ Tema claro";
     }
 
     if (themeToggle) {
         themeToggle.addEventListener("click", () => {
             document.body.classList.toggle("dark-mode");
-            if (document.body.classList.contains("dark-mode")) {
-                localStorage.setItem("tema", "oscuro");
-                themeToggle.textContent = "☀️ Tema claro";
-            } else {
-                localStorage.setItem("tema", "claro");
-                themeToggle.textContent = "🌙 Tema oscuro";
-            }
+            const esOscuro = document.body.classList.contains("dark-mode");
+            localStorage.setItem("tema", esOscuro ? "oscuro" : "claro");
+            themeToggle.textContent = esOscuro ? "☀️ Tema claro" : "🌙 Tema oscuro";
         });
-
-        if (document.body.classList.contains("dark-mode")) {
-            themeToggle.textContent = "☀️ Tema claro";
-        } else {
-            themeToggle.textContent = "🌙 Tema oscuro";
-        }
     }
 
-    // --- NAVEGACIÓN ENTRE PANTALLAS ---
-    function mostrarSeccion(seccionActiva) {
+    // ---- CONTROL UX: BOTÓN DE VER/OCULTAR CONTRASEÑA ----
+    togglePasswordButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+            const inputId = btn.getAttribute("data-target");
+            const inputField = document.getElementById(inputId);
+            if (inputField.type === "password") {
+                inputField.type = "text";
+                btn.textContent = "🙈";
+            } else {
+                inputField.type = "password";
+                btn.textContent = "👁️";
+            }
+        });
+    });
+
+    // ---- MOTOR DE NAVEGACIÓN INTERNA (SPA) ----
+    function conmutarVista(vistaDestino) {
         loginSection.classList.add("hidden");
         registerSection.classList.add("hidden");
         recoverSection.classList.add("hidden");
-        seccionActiva.classList.remove("hidden");
+        vistaDestino.classList.remove("hidden");
+        
+        // Resetear mensajes y formularios al cambiar de pantalla
         mensajeDiv.textContent = "";
         mensajeDiv.className = "message";
-    }
-
-    linkToRegister.addEventListener("click", (e) => { e.preventDefault(); mostrarSeccion(registerSection); });
-    linkToRecover.addEventListener("click", (e) => { e.preventDefault(); mostrarSeccion(recoverSection); });
-    linksToLogin.forEach(link => {
-        link.addEventListener("click", (e) => { e.preventDefault(); mostrarSeccion(loginSection); });
-    });
-
-    // --- FUNCIÓN AUXILIAR: VALIDACIÓN ESTRICTA DE CONTRASEÑA ---
-    function validarContrasena(password) {
-        const mayus = /[A-Z]/.test(password);
-        const minus = /[a-z]/.test(password);
-        const num = /[0-9]/.test(password);
-        const esp = /[^A-Za-z0-9]/.test(password);
-        return mayus && minus && num && esp;
-    }
-
-    // --- RF-01: INICIO DE SESIÓN ---
-    loginForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const usuario = document.getElementById("username").value.trim();
-        const contraseña = document.getElementById("password").value;
-        const db = JSON.parse(localStorage.getItem("cuentasSGG"));
-
-        mensajeDiv.className = "message";
-
-        if (!db[usuario]) {
-            mensajeDiv.textContent = "❌ Usuario no registrado.";
-            mensajeDiv.classList.add("error");
-        } else if (db[usuario].password === contraseña) {
-            mensajeDiv.textContent = "✅ Inicio de sesión exitoso.";
-            mensajeDiv.classList.add("success");
-        } else {
-            mensajeDiv.textContent = "❌ Contraseña incorrecta.";
-            mensajeDiv.classList.add("error");
-        }
-    });
-
-    // --- RF-03: REGISTRO DE USUARIO ---
-    registerForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const usuario = document.getElementById("regUsername").value.trim();
-        const email = document.getElementById("regEmail").value.trim();
-        const contraseña = document.getElementById("regPassword").value;
-        const db = JSON.parse(localStorage.getItem("cuentasSGG"));
-
-        mensajeDiv.className = "message";
-
-        if (db[usuario]) {
-            mensajeDiv.textContent = "❌ El nombre de usuario ya existe.";
-            mensajeDiv.classList.add("error");
-            return;
-        }
-
-        // Verificar correo duplicado
-        const correosRegistrados = Object.values(db).map(user => user.email);
-        if (correosRegistrados.includes(email)) {
-            mensajeDiv.textContent = "❌ El correo electrónico ya está en uso.";
-            mensajeDiv.classList.add("error");
-            return;
-        }
-
-        if (!validarContrasena(contraseña)) {
-            mensajeDiv.textContent = "❌ La contraseña requiere: 1 Mayúscula, 1 Minúscula, 1 Número y 1 Símbolo.";
-            mensajeDiv.classList.add("error");
-            return;
-        }
-
-        // Guardar usuario
-        db[usuario] = { password: contraseña, email: email };
-        localStorage.setItem("cuentasSGG", JSON.stringify(db));
-
-        mensajeDiv.textContent = "✅ Cuenta creada exitosamente.";
-        mensajeDiv.classList.add("success");
+        loginForm.reset();
         registerForm.reset();
-        setTimeout(() => mostrarSeccion(loginSection), 2000);
+        recoverForm.reset();
+        
+        // Resetear botones de contraseñas visibles a su estado base
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            if(input.id.includes("pass") || input.id.includes("Password")) input.type = "password";
+        });
+        togglePasswordButtons.forEach(b => b.textContent = "👁️");
+    }
+
+    linkToRegister.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(registerSection); });
+    linkToRecover.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(recoverSection); });
+    linksToLogin.forEach(link => {
+        link.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(loginSection); });
     });
 
-    // --- RF-04: RECUPERACIÓN DE CONTRASEÑA ---
-    recoverForm.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const usuario = document.getElementById("recUsername").value.trim();
-        const email = document.getElementById("recEmail").value.trim();
-        const nuevaContrasena = document.getElementById("recPassword").value;
+    // ---- VALIDACIÓN DE LAS REGLAS DE CONTRASEÑA ----
+    function analizarContrasena(pass) {
+        return {
+            longitud: pass.length >= 8,
+            mayuscula: /[A-Z]/.test(pass),
+            minuscula: /[a-z]/.test(pass),
+            numero: /[0-9]/.test(pass),
+            especial: /[^A-Za-z0-9]/.test(pass)
+        };
+    }
+
+    function refrescarChecklistUX(pass, prefijo, btnSubmit) {
+        const checks = analizarContrasena(pass);
+        
+        const procesarItem = (subId, valido, texto) => {
+            const el = document.getElementById(`${prefijo}${subId}`);
+            if (el) {
+                el.className = valido ? "req-valid" : "req-invalid";
+                el.textContent = (valido ? "✅ " : "❌ ") + texto;
+            }
+        };
+
+        procesarItem("ReqLen", checks.longitud, "Mínimo 8 caracteres");
+        procesarItem("ReqMay", checks.mayuscula, "Al menos 1 Mayúscula");
+        procesarItem("ReqMin", checks.minuscula, "Al menos 1 Minúscula");
+        procesarItem("ReqNum", checks.numero, "Al menos 1 Número");
+        procesarItem("ReqEsp", checks.especial, "Al menos 1 Carácter especial (!@#$%)");
+
+        const todoAprobado = Object.values(checks).every(v => v === true);
+        if (btnSubmit) btnSubmit.disabled = !todoAprobado;
+    }
+
+    // Escuchadores en tiempo real (Feedback UX)
+    const regPassword = document.getElementById("regPassword");
+    const btnRegisterSubmit = document.getElementById("btnRegisterSubmit");
+    regPassword.addEventListener("input", () => {
+        refrescarChecklistUX(regPassword.value, "reg", btnRegisterSubmit);
+    });
+
+    const recPassword = document.getElementById("recPassword");
+    const btnRecoverSubmit = document.getElementById("btnRecoverSubmit");
+    recPassword.addEventListener("input", () => {
+        refrescarChecklistUX(recPassword.value, "rec", btnRecoverSubmit);
+    });
+
+
+    // =========================================================================
+    // ACCIÓN: INICIO DE SESIÓN (RF-01)
+    // =========================================================================
+    let intentosFallidos = 0;
+    loginForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const user = document.getElementById("username").value.trim();
+        const pass = document.getElementById("password").value;
         const db = JSON.parse(localStorage.getItem("cuentasSGG"));
+        const btnSubmit = document.getElementById("btnLoginSubmit");
 
-        mensajeDiv.className = "message";
+        if (!db[user] || db[user].password !== pass) {
+            intentosFallidos++;
+            if (intentosFallidos >= 3) {
+                btnSubmit.disabled = true;
+                mensajeDiv.textContent = "🚨 Ciberseguridad Defensiva: Botón bloqueado por 30 segundos debido a 3 fallos.";
+                mensajeDiv.className = "message error";
+                setTimeout(() => {
+                    intentosFallidos = 0;
+                    btnSubmit.disabled = false;
+                    mensajeDiv.textContent = "🔓 Acceso desbloqueado. Intente nuevamente.";
+                    mensajeDiv.className = "message success";
+                }, 30000);
+            } else {
+                mensajeDiv.textContent = `❌ Credenciales incorrectas. Intentos: ${intentosFallidos}/3`;
+                mensajeDiv.className = "message error";
+            }
+        } else {
+            intentosFallidos = 0;
+            mensajeDiv.textContent = "✅ Autenticación correcta. ¡Bienvenido!";
+            mensajeDiv.className = "message success";
+        }
+    });
 
-        if (!db[usuario] || db[usuario].email !== email) {
-            mensajeDiv.textContent = "❌ Los datos no coinciden con ningún registro.";
-            mensajeDiv.classList.add("error");
+    // =========================================================================
+    // ACCIÓN: REGISTRO (RF-03)
+    // =========================================================================
+    registerForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const nombre = document.getElementById("regNombre").value.trim();
+        const apellido = document.getElementById("regApellido").value.trim();
+        const user = document.getElementById("regUser").value.trim();
+        const email = document.getElementById("regEmail").value.trim();
+        const fechaNac = document.getElementById("regBirth").value;
+        const pass = regPassword.value;
+        const passConf = document.getElementById("regPasswordConfirm").value;
+
+        // 1. Validar Nombre/Apellido sin números ni caracteres especiales
+        if (!/^[A-Za-zÁéíóúáéíóúÑñ\s]+$/.test(nombre) || !/^[A-Za-zÁéíóúáéíóúÑñ\s]+$/.test(apellido)) {
+            mensajeDiv.textContent = "❌ Nombre y Apellido solo deben contener letras.";
+            mensajeDiv.className = "message error";
             return;
         }
 
-        if (!validarContrasena(nuevaContrasena)) {
-            mensajeDiv.textContent = "❌ La nueva contraseña requiere: 1 Mayúscula, 1 Minúscula, 1 Número y 1 Símbolo.";
-            mensajeDiv.classList.add("error");
+        // 2. Control de Edad Crítica (Mínimo 14 años)
+        const hoy = new Date();
+        const cumple = new Date(fechaNac);
+        let edad = hoy.getFullYear() - cumple.getFullYear();
+        if (hoy.getMonth() < cumple.getMonth() || (hoy.getMonth() === cumple.getMonth() && hoy.getDate() < cumple.getDate())) {
+            edad--;
+        }
+        if (edad < 14) {
+            mensajeDiv.textContent = "❌ Registro rechazado: Debes ser mayor de 14 años.";
+            mensajeDiv.className = "message error";
             return;
         }
 
-        // Actualizar credencial
-        db[usuario].password = nuevaContrasena;
+        // 3. Formato de Correo Estricto (RegEx)
+        if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+            mensajeDiv.textContent = "❌ El formato del correo electrónico corporativo es inválido.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        // 4. Doble Match
+        if (pass !== passConf) {
+            mensajeDiv.textContent = "❌ Las contraseñas no coinciden.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        const db = JSON.parse(localStorage.getItem("cuentasSGG"));
+        if (db[user]) {
+            mensajeDiv.textContent = "❌ El nombre de usuario ya existe.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        // Verificar correos duplicados
+        if (Object.values(db).some(u => u.email.toLowerCase() === email.toLowerCase())) {
+            mensajeDiv.textContent = "❌ El correo electrónico ya está en uso.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        // Guardar Datos
+        db[user] = { password: pass, email: email, nombre: nombre, apellido: apellido };
         localStorage.setItem("cuentasSGG", JSON.stringify(db));
 
-        mensajeDiv.textContent = "✅ Contraseña actualizada correctamente.";
-        mensajeDiv.classList.add("success");
-        recoverForm.reset();
-        setTimeout(() => mostrarSeccion(loginSection), 2000);
+        mensajeDiv.textContent = "✅ Registro exitoso. Redirigiendo al Login...";
+        mensajeDiv.className = "message success";
+        setTimeout(() => conmutarVista(loginSection), 2000);
+    });
+
+    // =========================================================================
+    // ACCIÓN: RECUPERACIÓN (RF-04)
+    // =========================================================================
+    recoverForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const user = document.getElementById("recUser").value.trim();
+        const email = document.getElementById("recEmail").value.trim();
+        const pass = recPassword.value;
+        const passConf = document.getElementById("recPasswordConfirm").value;
+        const db = JSON.parse(localStorage.getItem("cuentasSGG"));
+
+        if (!db[user] || db[user].email.toLowerCase() !== email.toLowerCase()) {
+            mensajeDiv.textContent = "❌ Los datos no coinciden con ningún registro activo.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        // Regla: No repetir la contraseña actual
+        if (db[user].password === pass) {
+            mensajeDiv.textContent = "❌ La nueva contraseña no puede ser igual a la actual.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        if (pass !== passConf) {
+            mensajeDiv.textContent = "❌ Las contraseñas no coinciden.";
+            mensajeDiv.className = "message error";
+            return;
+        }
+
+        // Actualizar base de datos local
+        db[user].password = pass;
+        localStorage.setItem("cuentasSGG", JSON.stringify(db));
+
+        mensajeDiv.textContent = "✅ Contraseña actualizada con éxito.";
+        mensajeDiv.className = "message success";
+        setTimeout(() => conmutarVista(loginSection), 2000);
     });
 });
