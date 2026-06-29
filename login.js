@@ -51,9 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
             if (inputField.type === "password") {
                 inputField.type = "text";
                 btn.textContent = "🙈";
+                btn.setAttribute("aria-label", "Ocultar contraseña");
             } else {
                 inputField.type = "password";
                 btn.textContent = "👁️";
+                btn.setAttribute("aria-label", "Mostrar contraseña");
             }
         });
     });
@@ -80,7 +82,10 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll('input[type="text"]').forEach(input => {
             if(input.id.includes("pass") || input.id.includes("Password")) input.type = "password";
         });
-        togglePasswordButtons.forEach(b => b.textContent = "👁️");
+        togglePasswordButtons.forEach(b => {
+            b.textContent = "👁️";
+            b.setAttribute("aria-label", "Mostrar contraseña");
+        });
     }
 
     linkToRegister.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(registerSection); });
