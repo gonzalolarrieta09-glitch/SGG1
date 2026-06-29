@@ -6,61 +6,97 @@
     --btn-bg: #111827;
     --btn-hover: #374151;
     --success-green: #22c55e;
+    --border-color: #d1d5db;
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: linear-gradient(135deg, #1e293b, #334155);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    transition: background 0.3s ease;
 }
+
+/* Modo oscuro general (RF-02) */
+body.dark-mode {
+    background: linear-gradient(135deg, #0f172a, #020617);
+}
+body.dark-mode .login-container { background-color: #1f2937; color: white; }
+body.dark-mode h2, body.dark-mode label { color: #ffffff; }
+body.dark-mode input { background-color: #374151; color: white; border-color: #4b5563; }
+body.dark-mode button:not(.toggle-password-btn) { background-color: #3b82f6; }
+body.dark-mode button:not(.toggle-password-btn):hover { background-color: #2563eb; }
+body.dark-mode .form-links a { color: #60a5fa; }
 
 .login-container {
     background-color: var(--bg-card);
-    padding: 40px;
+    padding: 35px 40px;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 500px;
+    max-width: 460px;
     text-align: center;
+    box-sizing: border-box;
 }
 
-h2 {
-    color: var(--text-dark);
+.header-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
 }
 
-.input-group {
-    margin-bottom: 18px;
-    text-align: left;
-}
-
-label {
-    display: block;
-    margin-bottom: 6px;
+.theme-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: var(--btn-bg);
+    color: white;
+    border: none;
+    border-radius: 20px;
     font-weight: 600;
-    color: var(--text-dark);
+}
+
+h2 { color: var(--text-dark); margin-bottom: 25px; }
+.input-group { margin-bottom: 18px; text-align: left; }
+label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-dark); }
+
+/* Campo de contraseña relativo para incorporar el botón Ver/Ocultar */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-wrapper input { padding-right: 45px; }
+
+.toggle-password-btn {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px;
+    margin: 0;
+    width: auto;
+    color: #6b7280;
 }
 
 input {
     width: 100%;
     padding: 12px;
-    border: 2px solid #d1d5db;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 15px;
 }
+input:focus { outline: none; border-color: var(--line-red); }
 
-input:focus {
-    outline: none;
-    border-color: var(--line-red);
-}
-
-button {
+button:not(.toggle-password-btn) {
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     margin-top: 10px;
     border: none;
     border-radius: 8px;
@@ -68,79 +104,28 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
+    font-size: 15px;
 }
+button:not(.toggle-password-btn):hover { background-color: var(--btn-hover); }
+button:disabled { background-color: #9ca3af !important; cursor: not-allowed; }
 
-button:hover {
-    background-color: var(--btn-hover);
+.form-links { margin-top: 20px; font-size: 14px; }
+.form-links a { color: #2563eb; text-decoration: none; font-weight: 600; }
+.form-links a:hover { text-decoration: underline; }
+
+/* Mensajes y Alertas */
+.message { margin-top: 20px; font-weight: bold; font-size: 14px; min-height: 20px; }
+.success { color: var(--success-green); }
+.error { color: var(--line-red); }
+
+/* Checklist de los 5 requisitos UX */
+.requirements-list {
+    margin: 12px 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+    font-size: 13px;
 }
-
-.message {
-    margin-top: 20px;
-    font-weight: bold;
-}
-
-.success {
-    color: var(--success-green);
-}
-
-.error {
-    color: var(--line-red);
-}
-
-.theme-btn {
-    margin-bottom: 15px;
-}
-
-/* Modo oscuro */
-
-body.dark-mode {
-    background: linear-gradient(135deg, #0f172a, #020617);
-}
-
-body.dark-mode .login-container {
-    background-color: #1f2937;
-}
-
-body.dark-mode h2,
-body.dark-mode label {
-    color: white;
-}
-
-body.dark-mode input {
-    background-color: #374151;
-    color: white;
-    border-color: #60a5fa;
-}
-
-body.dark-mode input::placeholder {
-    color: #d1d5db;
-}
-
-/* ==========================================
-   NUEVOS ESTILOS REQUERIDOS
-========================================== */
-
-/* Alternar visibilidad de las secciones */
-.hidden {
-    display: none;
-}
-
-/* Enlaces inferiores de navegación */
-.form-links {
-    margin-top: 20px;
-    font-size: 14px;
-}
-
-.form-links a {
-    color: #3b82f6;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.form-links a:hover {
-    text-decoration: underline;
-}
-
-body.dark-mode .form-links a {
-    color: #60a5fa;
-}
+.requirements-list li { margin-bottom: 4px; font-weight: 500; transition: color 0.2s ease; }
+.req-invalid { color: var(--line-red); }
+.req-valid { color: var(--success-green); }
