@@ -10,7 +10,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     background: linear-gradient(135deg, #1e293b, #334155);
     display: flex;
     justify-content: center;
@@ -20,13 +20,14 @@ body {
     transition: background 0.3s ease;
 }
 
-/* Modo oscuro general (RF-02) */
+/* Modo oscuro */
 body.dark-mode {
     background: linear-gradient(135deg, #0f172a, #020617);
 }
-body.dark-mode .login-container { background-color: #1f2937; color: white; }
-body.dark-mode h2, body.dark-mode label { color: #ffffff; }
-body.dark-mode input { background-color: #374151; color: white; border-color: #4b5563; }
+body.dark-mode .login-container { background-color: #1f2937; }
+body.dark-mode h2, body.dark-mode label { color: white; }
+body.dark-mode input { background-color: #374151; color: white; border-color: #60a5fa; }
+body.dark-mode input::placeholder { color: #d1d5db; }
 body.dark-mode button:not(.toggle-password-btn) { background-color: #3b82f6; }
 body.dark-mode button:not(.toggle-password-btn):hover { background-color: #2563eb; }
 body.dark-mode .form-links a { color: #60a5fa; }
@@ -35,9 +36,9 @@ body.dark-mode .form-links a { color: #60a5fa; }
     background-color: var(--bg-card);
     padding: 35px 40px;
     border-radius: 18px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
     width: 90%;
-    max-width: 460px;
+    max-width: 480px;
     text-align: center;
     box-sizing: border-box;
 }
@@ -45,7 +46,7 @@ body.dark-mode .form-links a { color: #60a5fa; }
 .header-actions {
     display: flex;
     justify-content: flex-end;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .theme-btn {
@@ -59,28 +60,24 @@ body.dark-mode .form-links a { color: #60a5fa; }
     font-weight: 600;
 }
 
-h2 { color: var(--text-dark); margin-bottom: 25px; }
-.input-group { margin-bottom: 18px; text-align: left; }
+h2 { color: var(--text-dark); margin-top: 5px; }
+.input-group { margin-bottom: 16px; text-align: left; }
 label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-dark); }
 
-/* Campo de contraseña relativo para incorporar el botón Ver/Ocultar */
+/* Posicionamiento para ojito de password */
 .password-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
 .password-wrapper input { padding-right: 45px; }
-
 .toggle-password-btn {
     position: absolute;
-    right: 10px;
+    right: 12px;
     background: none;
     border: none;
     cursor: pointer;
     font-size: 16px;
-    padding: 5px;
-    margin: 0;
-    width: auto;
     color: #6b7280;
 }
 
@@ -96,7 +93,7 @@ input:focus { outline: none; border-color: var(--line-red); }
 
 button:not(.toggle-password-btn) {
     width: 100%;
-    padding: 13px;
+    padding: 12px;
     margin-top: 10px;
     border: none;
     border-radius: 8px;
@@ -113,19 +110,24 @@ button:disabled { background-color: #9ca3af !important; cursor: not-allowed; }
 .form-links a { color: #2563eb; text-decoration: none; font-weight: 600; }
 .form-links a:hover { text-decoration: underline; }
 
-/* Mensajes y Alertas */
-.message { margin-top: 20px; font-weight: bold; font-size: 14px; min-height: 20px; }
+/* Mensajes de Alerta */
+.message { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 24px; }
 .success { color: var(--success-green); }
 .error { color: var(--line-red); }
 
-/* Checklist de los 5 requisitos UX */
+/* Feedback UX Requisitos */
 .requirements-list {
-    margin: 12px 0;
+    margin: 10px 0 5px 0;
     padding: 0;
     list-style: none;
     text-align: left;
-    font-size: 13px;
+    font-size: 12.5px;
 }
-.requirements-list li { margin-bottom: 4px; font-weight: 500; transition: color 0.2s ease; }
+.requirements-list li { margin-bottom: 3px; font-weight: 500; }
 .req-invalid { color: var(--line-red); }
 .req-valid { color: var(--success-green); }
+
+/* REGLA CENTRAL DE SPA: Ocultamiento Absoluto */
+.hidden {
+    display: none !important;
+}
