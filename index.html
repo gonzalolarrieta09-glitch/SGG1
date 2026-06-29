@@ -3,40 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGG - Iniciar Sesión</title>
+    <title>SGG - Sistema Unificado</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <main class="login-container">
         <div class="header-actions">
             <button id="themeToggle" class="theme-btn" type="button">🌙 Tema oscuro</button>
         </div>
 
-        <h2>Iniciar Sesión</h2>
-        <form id="loginForm">
-            <div class="input-group">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" placeholder="Ingrese su usuario" required>
-            </div>
-
-            <div class="input-group">
-                <label for="password">Contraseña</label>
-                <div class="password-wrapper">
-                    <input type="password" id="password" placeholder="Ingrese su contraseña" required>
-                    <button type="button" class="toggle-password-btn" data-target="password">👁️</button>
+        <div id="loginSection">
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="username">Usuario</label>
+                    <input type="text" id="username" placeholder="Ingrese su usuario" required>
                 </div>
-            </div>
 
-            <button type="submit" id="btnLoginSubmit">Ingresar</button>
-        </form>
+                <div class="input-group">
+                    <label for="password">Contraseña</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="password" placeholder="Ingrese su contraseña" required>
+                        <button type="button" class="toggle-password-btn" data-target="password">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnLoginSubmit">Ingresar</button>
+            </form>
+
+            <div class="form-links">
+                <a href="#" id="linkToRegister">Registrar nueva cuenta</a> | 
+                <a href="#" id="linkToRecover">Olvidé mi contraseña</a>
+            </div>
+        </div>
+
+        <div id="registerSection" class="hidden">
+            <h2>Formulario de Registro</h2>
+            <form id="registerForm">
+                <div class="input-group">
+                    <label for="regNombre">Nombre/s</label>
+                    <input type="text" id="regNombre" placeholder="Ej: Juan Carlos" required>
+                </div>
+                <div class="input-group">
+                    <label for="regApellido">Apellido/s</label>
+                    <input type="text" id="regApellido" placeholder="Ej: Pérez" required>
+                </div>
+                <div class="input-group">
+                    <label for="regUser">Nombre de Usuario</label>
+                    <input type="text" id="regUser" placeholder="Crea tu alias" required>
+                </div>
+                <div class="input-group">
+                    <label for="regEmail">Correo Electrónico Corporativo</label>
+                    <input type="email" id="regEmail" placeholder="nombre@empresa.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="regBirth">Fecha de Nacimiento</label>
+                    <input type="date" id="regBirth" required>
+                </div>
+                <div class="input-group">
+                    <label for="regPassword">Contraseña</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="regPassword" placeholder="Crea una clave segura" required>
+                        <button type="button" class="toggle-password-btn" data-target="regPassword">👁️</button>
+                    </div>
+                    <ul class="requirements-list" id="regReqList">
+                        <li id="regReqLen" class="req-invalid">❌ Mínimo 8 caracteres</li>
+                        <li id="regReqMay" class="req-invalid">❌ Al menos 1 Mayúscula</li>
+                        <li id="regReqMin" class="req-invalid">❌ Al menos 1 Minúscula</li>
+                        <li id="regReqNum" class="req-invalid">❌ Al menos 1 Número</li>
+                        <li id="regReqEsp" class="req-invalid">❌ Al menos 1 Carácter especial (!@#$%)</li>
+                    </ul>
+                </div>
+                <div class="input-group">
+                    <label for="regPasswordConfirm">Repetir Contraseña</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="regPasswordConfirm" placeholder="Confirma tu clave" required>
+                        <button type="button" class="toggle-password-btn" data-target="regPasswordConfirm">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnRegisterSubmit" disabled>Registrar Cuenta</button>
+            </form>
+
+            <div class="form-links">
+                <a href="#" class="linkToLogin">← Volver al Inicio de Sesión</a>
+            </div>
+        </div>
+
+        <div id="recoverSection" class="hidden">
+            <h2>Recuperar Contraseña</h2>
+            <form id="recoverForm">
+                <div class="input-group">
+                    <label for="recUser">Usuario</label>
+                    <input type="text" id="recUser" placeholder="Ingrese su alias" required>
+                </div>
+                <div class="input-group">
+                    <label for="recEmail">Correo Registrado</label>
+                    <input type="email" id="recEmail" placeholder="correo@ejemplo.com" required>
+                </div>
+                <div class="input-group">
+                    <label for="recPassword">Nueva Contraseña</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="recPassword" placeholder="Nueva clave" required>
+                        <button type="button" class="toggle-password-btn" data-target="recPassword">👁️</button>
+                    </div>
+                    <ul class="requirements-list" id="recReqList">
+                        <li id="recReqLen" class="req-invalid">❌ Mínimo 8 caracteres</li>
+                        <li id="recReqMay" class="req-invalid">❌ Al menos 1 Mayúscula</li>
+                        <li id="recReqMin" class="req-invalid">❌ Al menos 1 Minúscula</li>
+                        <li id="recReqNum" class="req-invalid">❌ Al menos 1 Número</li>
+                        <li id="recReqEsp" class="req-invalid">❌ Al menos 1 Carácter especial</li>
+                    </ul>
+                </div>
+                <div class="input-group">
+                    <label for="recPasswordConfirm">Repetir Nueva Contraseña</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="recPasswordConfirm" placeholder="Confirma tu nueva clave" required>
+                        <button type="button" class="toggle-password-btn" data-target="recPasswordConfirm">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnRecoverSubmit" disabled>Actualizar Credencial</button>
+            </form>
+
+            <div class="form-links">
+                <a href="#" class="linkToLogin">← Volver al Inicio de Sesión</a>
+            </div>
+        </div>
 
         <div id="mensajeResultado" class="message"></div>
 
-        <div class="form-links">
-            <a href="registro.html">Registrar nueva cuenta</a> | 
-            <a href="recuperar.html">Olvidé mi contraseña</a>
-        </div>
     </main>
+
     <script src="login.js"></script>
 </body>
 </html>
