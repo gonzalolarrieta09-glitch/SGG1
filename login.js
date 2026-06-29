@@ -71,6 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.reset();
         registerForm.reset();
         recoverForm.reset();
+
+        // Ocultar listas de requerimientos de nuevo al cambiar de vista
+        document.getElementById("regReqList").classList.add("hidden");
+        document.getElementById("recReqList").classList.add("hidden");
         
         // Resetear botones de contraseñas visibles a su estado base
         document.querySelectorAll('input[type="text"]').forEach(input => {
@@ -98,6 +102,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function refrescarChecklistUX(pass, prefijo, btnSubmit) {
         const checks = analizarContrasena(pass);
+        const listaContenedora = document.getElementById(`${prefijo}ReqList`);
+        
+        // Mostrar u ocultar la lista completa dependiendo de si hay texto ingresado
+        if (pass.length > 0) {
+            listaContenedora.classList.remove("hidden");
+        } else {
+            listaContenedora.classList.add("hidden");
+        }
         
         const procesarItem = (subId, valido, texto) => {
             const el = document.getElementById(`${prefijo}${subId}`);
@@ -117,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (btnSubmit) btnSubmit.disabled = !todoAprobado;
     }
 
-    // Escuchadores en tiempo real (Feedback UX)
+    // Escuchadores en tiempo real (Feedback UX dinámico)
     const regPassword = document.getElementById("regPassword");
     const btnRegisterSubmit = document.getElementById("btnRegisterSubmit");
     regPassword.addEventListener("input", () => {
