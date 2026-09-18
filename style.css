@@ -11,40 +11,94 @@
 }
 
 body {
-    font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #1e293b, #334155);
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
     transition: background 0.3s ease;
 }
 
 /* Modo oscuro optimizado */
 body.dark-mode {
     background: linear-gradient(135deg, #0f172a, #020617);
+    color: #ffffff;
 }
-body.dark-mode .login-container { background-color: #1f2937; }
-body.dark-mode h2, body.dark-mode label { color: #ffffff; }
-body.dark-mode input { background-color: #374151; color: #ffffff; border-color: #93c5fd; }
-body.dark-mode input::placeholder { color: #e5e7eb; }
-body.dark-mode button:not(.toggle-password-btn) { background-color: #3b82f6; color: #ffffff; }
-body.dark-mode button:not(.toggle-password-btn):hover { background-color: #1d4ed8; }
-body.dark-mode .form-links a { color: #93c5fd; } 
-body.dark-mode .toggle-password-btn { color: #e5e7eb; }
-body.dark-mode .req-invalid { color: #ff8a8a; } /* Tono corregido para romper la barrera del +90 */
-body.dark-mode .req-valid { color: #4ade80; }
+body.dark-mode .login-container,
+body.dark-mode main,
+body.dark-mode dialog {
+    background-color: #1f2937;
+    color: #ffffff;
+}
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode label { 
+    color: #ffffff; 
+}
+body.dark-mode input,
+body.dark-mode select { 
+    background-color: #374151; 
+    color: #ffffff; 
+    border-color: #93c5fd; 
+}
+body.dark-mode input::placeholder { 
+    color: #e5e7eb; 
+}
+body.dark-mode button:not(.toggle-password-btn):not(.btn-eliminar) { 
+    background-color: #3b82f6; 
+    color: #ffffff; 
+}
+body.dark-mode button:not(.toggle-password-btn):not(.btn-eliminar):hover { 
+    background-color: #1d4ed8; 
+}
+body.dark-mode .form-links a { 
+    color: #93c5fd; 
+} 
+body.dark-mode .toggle-password-btn { 
+    color: #e5e7eb; 
+}
+body.dark-mode .req-invalid { 
+    color: #ff8a8a; 
+}
+body.dark-mode .req-valid { 
+    color: #4ade80; 
+}
+body.dark-mode table th {
+    background-color: #374151;
+    color: #ffffff;
+}
+body.dark-mode table td {
+    border-color: #4b5563;
+}
 
-.login-container {
+/* Contenedor Principal (Login y Dashboard) */
+.login-container, main {
     background-color: var(--bg-card);
     padding: 35px 40px;
     border-radius: 18px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    width: 90%;
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+}
+
+.login-container {
     max-width: 480px;
     text-align: center;
-    box-sizing: border-box;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
 }
 
 .header-actions {
@@ -53,7 +107,7 @@ body.dark-mode .req-valid { color: #4ade80; }
     margin-bottom: 10px;
 }
 
-.theme-btn {
+.theme-btn, #btn-logout {
     padding: 6px 12px;
     font-size: 13px;
     cursor: pointer;
@@ -62,18 +116,36 @@ body.dark-mode .req-valid { color: #4ade80; }
     border: none;
     border-radius: 20px;
     font-weight: 600;
+    margin-left: 5px;
 }
 
-h2 { color: var(--text-dark); margin-top: 5px; }
-.input-group { margin-bottom: 16px; text-align: left; }
-label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-dark); }
+h1, h2, h3 { 
+    color: var(--text-dark); 
+    margin-top: 5px; 
+}
+
+.input-group, section { 
+    margin-bottom: 20px; 
+    text-align: left; 
+}
+
+label { 
+    display: block; 
+    margin-bottom: 6px; 
+    font-weight: 600; 
+    color: var(--text-dark); 
+}
 
 .password-wrapper {
     position: relative;
     display: flex;
     align-items: center;
 }
-.password-wrapper input { padding-right: 45px; }
+
+.password-wrapper input { 
+    padding-right: 45px; 
+}
+
 .toggle-password-btn {
     position: absolute;
     right: 12px;
@@ -85,18 +157,22 @@ label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--text-
     padding: 4px;
 }
 
-input {
+input, select {
     width: 100%;
     padding: 12px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
     box-sizing: border-box;
     font-size: 15px;
+    margin-bottom: 10px;
 }
-input:focus { outline: none; border-color: #3b82f6; }
+
+input:focus, select:focus { 
+    outline: none; 
+    border-color: #3b82f6; 
+}
 
 button:not(.toggle-password-btn) {
-    width: 100%;
     padding: 12px;
     margin-top: 10px;
     border: none;
@@ -107,18 +183,90 @@ button:not(.toggle-password-btn) {
     cursor: pointer;
     font-size: 15px;
 }
-button:not(.toggle-password-btn):hover { background-color: var(--btn-hover); }
+
+#form-gasto button[type="submit"], #btnLoginSubmit, #btnRegisterSubmit, #btnRecoverSubmit {
+    width: 100%;
+}
+
+button:not(.toggle-password-btn):hover { 
+    background-color: var(--btn-hover); 
+}
+
 button:disabled { 
     background-color: #9ca3af !important; 
-    color: #111827 !important; /* Contraste robustecido para modo claro */
+    color: #111827 !important;
     cursor: not-allowed; 
 }
 
-.form-links { margin-top: 20px; font-size: 14px; color: inherit; }
-.form-links a { color: var(--link-color); text-decoration: underline; font-weight: 600; }
-.form-links a:hover { text-decoration: none; }
+/* Tablas e Historial de Gastos (RF-06) */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
 
-.message { margin-top: 15px; font-weight: bold; font-size: 14px; min-height: 24px; }
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: #f3f4f6;
+    color: var(--text-dark);
+}
+
+.btn-editar {
+    background-color: #d97706 !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+}
+
+.btn-eliminar {
+    background-color: var(--line-red) !important;
+    padding: 6px 12px !important;
+    font-size: 13px !important;
+}
+
+/* Modal de Confirmación (RF-08) */
+dialog {
+    border: none;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    background-color: var(--bg-card);
+    max-width: 400px;
+    text-align: center;
+}
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+/* Enlaces y Mensajes */
+.form-links { 
+    margin-top: 20px; 
+    font-size: 14px; 
+    color: inherit; 
+}
+
+.form-links a { 
+    color: var(--link-color); 
+    text-decoration: underline; 
+    font-weight: 600; 
+}
+
+.form-links a:hover { 
+    text-decoration: none; 
+}
+
+.message { 
+    margin-top: 15px; 
+    font-weight: bold; 
+    font-size: 14px; 
+    min-height: 24px; 
+}
+
 .success { color: var(--success-green); }
 .error { color: var(--line-red); }
 
@@ -129,7 +277,12 @@ button:disabled {
     text-align: left;
     font-size: 12.5px;
 }
-.requirements-list li { margin-bottom: 3px; font-weight: 500; }
+
+.requirements-list li { 
+    margin-bottom: 3px; 
+    font-weight: 500; 
+}
+
 .req-invalid { color: var(--line-red); }
 .req-valid { color: var(--success-green); }
 
