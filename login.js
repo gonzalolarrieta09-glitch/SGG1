@@ -8,12 +8,18 @@ if (!localStorage.getItem("cuentasSGG")) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Si ya existe una sesión activa, redirige directamente al dashboard
+    if (localStorage.getItem("usuario_activo")) {
+        window.location.href = "dashboard.html";
+        return;
+    }
+
     // Componentes del DOM Globales
     const themeToggle = document.getElementById("themeToggle");
     const mensajeDiv = document.getElementById("mensajeResultado");
     const togglePasswordButtons = document.querySelectorAll(".toggle-password-btn");
 
-    // Componentes de Secciones Unificadas
+    // Componentes de Secciones Unificadas (SPA)
     const loginSection = document.getElementById("loginSection");
     const registerSection = document.getElementById("registerSection");
     const recoverSection = document.getElementById("recoverSection");
@@ -67,18 +73,15 @@ document.addEventListener("DOMContentLoaded", () => {
         recoverSection.classList.add("hidden");
         vistaDestino.classList.remove("hidden");
         
-        // Resetear mensajes y formularios al cambiar de pantalla
         mensajeDiv.textContent = "";
         mensajeDiv.className = "message";
         loginForm.reset();
         registerForm.reset();
         recoverForm.reset();
 
-        // Ocultar listas de requerimientos de nuevo al cambiar de vista
         document.getElementById("regReqList").classList.add("hidden");
         document.getElementById("recReqList").classList.add("hidden");
         
-        // Resetear botones de contraseñas visibles a su estado base
         document.querySelectorAll('input[type="text"]').forEach(input => {
             if(input.id.includes("pass") || input.id.includes("Password")) input.type = "password";
         });
@@ -88,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    linkToRegister.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(registerSection); });
-    linkToRecover.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(recoverSection); });
+    if (linkToRegister) linkToRegister.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(registerSection); });
+    if (linkToRecover) linkToRecover.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(recoverSection); });
     linksToLogin.forEach(link => {
         link.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(loginSection); });
     });
@@ -109,7 +112,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const checks = analizarContrasena(pass);
         const listaContenedora = document.getElementById(`${prefijo}ReqList`);
         
-        // Mostrar u ocultar la lista completa dependiendo de si hay texto ingresado
         if (pass.length > 0) {
             listaContenedora.classList.remove("hidden");
         } else {
@@ -134,21 +136,24 @@ document.addEventListener("DOMContentLoaded", () => {
         if (btnSubmit) btnSubmit.disabled = !todoAprobado;
     }
 
-    // Escuchadores en tiempo real (Feedback UX dinámico)
     const regPassword = document.getElementById("regPassword");
     const btnRegisterSubmit = document.getElementById("btnRegisterSubmit");
-    regPassword.addEventListener("input", () => {
-        refrescarChecklistUX(regPassword.value, "reg", btnRegisterSubmit);
-    });
+    if (regPassword) {
+        regPassword.addEventListener("input", () => {
+            refrescarChecklistUX(regPassword.value, "reg", btnRegisterSubmit);
+        });
+    }
 
     const recPassword = document.getElementById("recPassword");
     const btnRecoverSubmit = document.getElementById("btnRecoverSubmit");
-    recPassword.addEventListener("input", () => {
-        refrescarChecklistUX(recPassword.value, "rec", btnRecoverSubmit);
-    });
+    if (recPassword) {
+        recPassword.addEventListener("input", () => {
+            refrescarChecklistUX(recPassword.value, "rec", btnRecoverSubmit);
+        });
+    }
 
     // =========================================================================
-    // ACCIÓN: INICIO DE SESIÓN (RF-01)
+    // ACCIÓN: INICIO DE SESIÓN (RF-01) - Vinculado a dashboard.html
     // =========================================================================
     let intentosFallidos = 0;
     loginForm.addEventListener("submit", (e) => {
@@ -176,8 +181,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } else {
             intentosFallidos = 0;
-            mensajeDiv.textContent = "✅ Autenticación correcta. ¡Bienvenido!";
+            // Establece sesión del usuario activo
+            localStorage.setItem("usuario_activo", user);
+            mensajeDiv.textContent = "✅ Autenticación correcta. Redirigiendo al Dashboard...";
             mensajeDiv.className = "message success";
+            
+            // Redirección al panel del CRUD
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1000);
         }
     });
 
@@ -194,14 +206,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const pass = regPassword.value;
         const passConf = document.getElementById("regPasswordConfirm").value;
 
-        // 1. Validar Nombre/Apellido sin números ni caracteres especiales
-        if (!/^[A-Za-zÁéíóúáéíóúÑñ\s]+$/.test(nombre) || !/^[A-Za-zÁéíóúáéíóúÑñ\s]+$/.test(apellido)) {
+        if (!/^[A-Za-zÁéíóúáéíóúÑñ\s]+$/.test(nombre) \vert{}\vert{} !/^[A-Za-zÁéíóúáéíóúÑñ\s]+$/.test(apellido)) {
             mensajeDiv.textContent = "❌ Nombre y Apellido solo deben contener letras.";
             mensajeDiv.className = "message error";
             return;
         }
 
-        // 2. Control de Edad Crítica (Mínimo 14 años)
         const hoy = new Date();
         const cumple = new Date(fechaNac);
         let edad = hoy.getFullYear() - cumple.getFullYear();
@@ -214,14 +224,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // 3. Formato de Correo Estricto (RegEx)
         if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
             mensajeDiv.textContent = "❌ El formato del correo electrónico corporativo es inválido.";
             mensajeDiv.className = "message error";
             return;
         }
 
-        // 4. Doble Match
         if (pass !== passConf) {
             mensajeDiv.textContent = "❌ Las contraseñas no coinciden.";
             mensajeDiv.className = "message error";
@@ -235,14 +243,12 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Verificar correos duplicados
         if (Object.values(db).some(u => u.email.toLowerCase() === email.toLowerCase())) {
             mensajeDiv.textContent = "❌ El correo electrónico ya está en uso.";
             mensajeDiv.className = "message error";
             return;
         }
 
-        // Guardar Datos
         db[user] = { password: pass, email: email, nombre: nombre, apellido: apellido };
         localStorage.setItem("cuentasSGG", JSON.stringify(db));
 
@@ -268,7 +274,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Regla: No repetir la contraseña actual
         if (db[user].password === pass) {
             mensajeDiv.textContent = "❌ La nueva contraseña no puede ser igual a la actual.";
             mensajeDiv.className = "message error";
@@ -281,7 +286,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Actualizar base de datos local
         db[user].password = pass;
         localStorage.setItem("cuentasSGG", JSON.stringify(db));
 
