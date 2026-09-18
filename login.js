@@ -54,14 +54,16 @@ document.addEventListener("DOMContentLoaded", () => {
         btn.addEventListener("click", () => {
             const inputId = btn.getAttribute("data-target");
             const inputField = document.getElementById(inputId);
-            if (inputField.type === "password") {
-                inputField.type = "text";
-                btn.textContent = "🙈";
-                btn.setAttribute("aria-label", "Ocultar contraseña");
-            } else {
-                inputField.type = "password";
-                btn.textContent = "👁️";
-                btn.setAttribute("aria-label", "Mostrar contraseña");
+            if (inputField) {
+                if (inputField.type === "password") {
+                    inputField.type = "text";
+                    btn.textContent = "🙈";
+                    btn.setAttribute("aria-label", "Ocultar contraseña");
+                } else {
+                    inputField.type = "password";
+                    btn.textContent = "👁️";
+                    btn.setAttribute("aria-label", "Mostrar contraseña");
+                }
             }
         });
     });
@@ -152,9 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // =========================================================================
-    // ACCIÓN: INICIO DE SESIÓN (RF-01) - Vinculado a dashboard.html
-    // =========================================================================
+    // ---- INICIO DE SESIÓN ----
     let intentosFallidos = 0;
     loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -181,21 +181,17 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         } else {
             intentosFallidos = 0;
-            // Establece sesión del usuario activo
             localStorage.setItem("usuario_activo", user);
             mensajeDiv.textContent = "✅ Autenticación correcta. Redirigiendo al Dashboard...";
             mensajeDiv.className = "message success";
             
-            // Redirección al panel del CRUD
             setTimeout(() => {
                 window.location.href = "dashboard.html";
             }, 1000);
         }
     });
 
-    // =========================================================================
-    // ACCIÓN: REGISTRO (RF-03)
-    // =========================================================================
+    // ---- REGISTRO ----
     registerForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const nombre = document.getElementById("regNombre").value.trim();
@@ -257,9 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => conmutarVista(loginSection), 2000);
     });
 
-    // =========================================================================
-    // ACCIÓN: RECUPERACIÓN (RF-04)
-    // =========================================================================
+    // ---- RECUPERACIÓN ----
     recoverForm.addEventListener("submit", (e) => {
         e.preventDefault();
         const user = document.getElementById("recUser").value.trim();
