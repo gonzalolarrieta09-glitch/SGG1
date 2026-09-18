@@ -2,60 +2,61 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SGG - Sistema Unificado</title>
+    <title>Sistema SGG</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main class="login-container">
+    <div class="login-container">
         <div class="header-actions">
-            <button id="themeToggle" class="theme-btn" type="button" aria-label="Cambiar tema de la interfaz">🌙 Tema oscuro</button>
+            <button id="themeToggle" class="theme-btn">🌙 Tema oscuro</button>
         </div>
 
-        <div id="loginSection">
+        <!-- Mensaje de feedback global -->
+        <div id="mensajeResultado" class="message"></div>
+
+        <!-- SECCIÓN 1: LOGIN -->
+        <section id="loginSection">
             <h2>Iniciar Sesión</h2>
             <form id="loginForm">
                 <div class="input-group">
                     <label for="username">Usuario</label>
-                    <input type="text" id="username" placeholder="Ingrese su usuario" required>
+                    <input type="text" id="username" required>
                 </div>
-
                 <div class="input-group">
                     <label for="password">Contraseña</label>
                     <div class="password-wrapper">
-                        <input type="password" id="password" placeholder="Ingrese su contraseña" required>
-                        <button type="button" class="toggle-password-btn" data-target="password" aria-label="Mostrar contraseña">👁️</button>
+                        <input type="password" id="password" required>
+                        <button type="button" class="toggle-password-btn" data-target="password">👁️</button>
                     </div>
                 </div>
-
                 <button type="submit" id="btnLoginSubmit">Ingresar</button>
             </form>
-
             <div class="form-links">
-                <a href="#" id="linkToRegister" role="button">Registrar nueva cuenta</a> | 
-                <a href="#" id="linkToRecover" role="button">Olvidé mi contraseña</a>
+                <a href="#" id="linkToRegister">¿No tienes cuenta? Regístrate</a><br>
+                <a href="#" id="linkToRecover">¿Olvidaste tu contraseña?</a>
             </div>
-        </div>
+        </section>
 
-        <div id="registerSection" class="hidden">
-            <h2>Formulario de Registro</h2>
+        <!-- SECCIÓN 2: REGISTRO (Oculto por defecto) -->
+        <section id="registerSection" class="hidden">
+            <h2>Registro de Usuario</h2>
             <form id="registerForm">
                 <div class="input-group">
-                    <label for="regNombre">Nombre/s</label>
-                    <input type="text" id="regNombre" placeholder="Ej: Juan Carlos" required>
+                    <label for="regNombre">Nombre</label>
+                    <input type="text" id="regNombre" required>
                 </div>
                 <div class="input-group">
-                    <label for="regApellido">Apellido/s</label>
-                    <input type="text" id="regApellido" placeholder="Ej: Pérez" required>
+                    <label for="regApellido">Apellido</label>
+                    <input type="text" id="regApellido" required>
                 </div>
                 <div class="input-group">
                     <label for="regUser">Nombre de Usuario</label>
-                    <input type="text" id="regUser" placeholder="Crea tu alias" required>
+                    <input type="text" id="regUser" required>
                 </div>
                 <div class="input-group">
-                    <label for="regEmail">Correo Electrónico Corporativo</label>
-                    <input type="email" id="regEmail" placeholder="nombre@empresa.com" required>
+                    <label for="regEmail">Correo Electrónico</label>
+                    <input type="email" id="regEmail" required>
                 </div>
                 <div class="input-group">
                     <label for="regBirth">Fecha de Nacimiento</label>
@@ -64,10 +65,10 @@
                 <div class="input-group">
                     <label for="regPassword">Contraseña</label>
                     <div class="password-wrapper">
-                        <input type="password" id="regPassword" placeholder="Crea una clave segura" required>
-                        <button type="button" class="toggle-password-btn" data-target="regPassword" aria-label="Mostrar contraseña">👁️</button>
+                        <input type="password" id="regPassword" required>
+                        <button type="button" class="toggle-password-btn" data-target="regPassword">👁️</button>
                     </div>
-                    <ul class="requirements-list hidden" id="regReqList">
+                    <ul id="regReqList" class="requirements-list hidden">
                         <li id="regReqLen" class="req-invalid">❌ Mínimo 8 caracteres</li>
                         <li id="regReqMay" class="req-invalid">❌ Al menos 1 Mayúscula</li>
                         <li id="regReqMin" class="req-invalid">❌ Al menos 1 Minúscula</li>
@@ -76,66 +77,56 @@
                     </ul>
                 </div>
                 <div class="input-group">
-                    <label for="regPasswordConfirm">Repetir Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="regPasswordConfirm" placeholder="Confirma tu clave" required>
-                        <button type="button" class="toggle-password-btn" data-target="regPasswordConfirm" aria-label="Mostrar contraseña">👁️</button>
-                    </div>
+                    <label for="regPasswordConfirm">Confirmar Contraseña</label>
+                    <input type="password" id="regPasswordConfirm" required>
                 </div>
-
-                <button type="submit" id="btnRegisterSubmit" disabled>Registrar Cuenta</button>
+                <button type="submit" id="btnRegisterSubmit" disabled>Registrarse</button>
             </form>
-
             <div class="form-links">
-                <a href="#" class="linkToLogin" role="button">← Volver al Inicio de Sesión</a>
+                <a href="#" class="linkToLogin">¿Ya tienes cuenta? Inicia sesión</a>
             </div>
-        </div>
+        </section>
 
-        <div id="recoverSection" class="hidden">
+        <!-- SECCIÓN 3: RECUPERACIÓN (Oculto por defecto) -->
+        <section id="recoverSection" class="hidden">
             <h2>Recuperar Contraseña</h2>
             <form id="recoverForm">
                 <div class="input-group">
                     <label for="recUser">Usuario</label>
-                    <input type="text" id="recUser" placeholder="Ingrese su alias" required>
+                    <input type="text" id="recUser" required>
                 </div>
                 <div class="input-group">
-                    <label for="recEmail">Correo Registrado</label>
-                    <input type="email" id="recEmail" placeholder="correo@ejemplo.com" required>
+                    <label for="recEmail">Correo Electrónico</label>
+                    <input type="email" id="recEmail" required>
                 </div>
                 <div class="input-group">
                     <label for="recPassword">Nueva Contraseña</label>
                     <div class="password-wrapper">
-                        <input type="password" id="recPassword" placeholder="Nueva clave" required>
-                        <button type="button" class="toggle-password-btn" data-target="recPassword" aria-label="Mostrar contraseña">👁️</button>
+                        <input type="password" id="recPassword" required>
+                        <button type="button" class="toggle-password-btn" data-target="recPassword">👁️</button>
                     </div>
-                    <ul class="requirements-list hidden" id="recReqList">
+                    <ul id="recReqList" class="requirements-list hidden">
                         <li id="recReqLen" class="req-invalid">❌ Mínimo 8 caracteres</li>
                         <li id="recReqMay" class="req-invalid">❌ Al menos 1 Mayúscula</li>
                         <li id="recReqMin" class="req-invalid">❌ Al menos 1 Minúscula</li>
                         <li id="recReqNum" class="req-invalid">❌ Al menos 1 Número</li>
-                        <li id="recReqEsp" class="req-invalid">❌ Al menos 1 Carácter especial</li>
+                        <li id="recReqEsp" class="req-invalid">❌ Al menos 1 Carácter especial (!@#$%)</li>
                     </ul>
                 </div>
                 <div class="input-group">
-                    <label for="recPasswordConfirm">Repetir Nueva Contraseña</label>
-                    <div class="password-wrapper">
-                        <input type="password" id="recPasswordConfirm" placeholder="Confirma tu nueva clave" required>
-                        <button type="button" class="toggle-password-btn" data-target="recPasswordConfirm" aria-label="Mostrar contraseña">👁️</button>
-                    </div>
+                    <label for="recPasswordConfirm">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="recPasswordConfirm" required>
                 </div>
-
-                <button type="submit" id="btnRecoverSubmit" disabled>Actualizar Credencial</button>
+                <button type="submit" id="btnRecoverSubmit" disabled>Actualizar Contraseña</button>
             </form>
-
             <div class="form-links">
-                <a href="#" class="linkToLogin" role="button">← Volver al Inicio de Sesión</a>
+                <a href="#" class="linkToLogin">Volver al Inicio de Sesión</a>
             </div>
-        </div>
+        </section>
 
-        <div id="mensajeResultado" class="message" aria-live="polite"></div>
+    </div>
 
-    </main>
-
+    <!-- Vinculación del script del login -->
     <script src="login.js"></script>
 </body>
 </html>
