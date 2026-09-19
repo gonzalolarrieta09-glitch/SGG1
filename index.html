@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema SGG - Autenticación</title>
+  <title>Sistema SGG - Gestión de Gastos</title>
   <style>
-    /* REGLA DE OCULTAMIENTO */
     .hidden {
       display: none !important;
     }
@@ -18,22 +17,20 @@
       transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     }
 
-    /* --- TEMA CLARO (PREDETERMINADO) --- */
     :root {
-      --bg-body: #f1f5f9;         /* Gris claro suave */
-      --bg-card: #ffffff;         /* Tarjeta blanca */
+      --bg-body: #f1f5f9;
+      --bg-card: #ffffff;
       --border-card: #e2e8f0;
-      --text-primary: #0f172a;    /* Texto oscuro */
+      --text-primary: #0f172a;
       --text-secondary: #334155;
       --text-muted: #64748b;
       --bg-input: #f8fafc;
       --border-input: #cbd5e1;
-      --btn-bg: #d97706;         /* Dorado/Ámbar elegante */
+      --btn-bg: #d97706;
       --btn-hover: #b45309;
       --link-color: #d97706;
     }
 
-    /* --- TEMA OSCURO --- */
     body.dark-mode {
       --bg-body: #0d1117;
       --bg-card: #161b22;
@@ -43,7 +40,7 @@
       --text-muted: #8b949e;
       --bg-input: #21262d;
       --border-input: #30363d;
-      --btn-bg: #2563eb;         /* Azul en modo oscuro */
+      --btn-bg: #2563eb;
       --btn-hover: #1d4ed8;
       --link-color: #58a6ff;
     }
@@ -61,7 +58,7 @@
     .card-container {
       background-color: var(--bg-card);
       width: 100%;
-      max-width: 380px;
+      max-width: 500px;
       padding: 28px 24px;
       border-radius: 16px;
       border: 1px solid var(--border-card);
@@ -87,23 +84,21 @@
       background-color: var(--btn-hover);
     }
 
-    h2 {
+    h2, h3 {
       text-align: center;
-      font-size: 1.4rem;
       color: var(--text-primary);
-      margin-bottom: 8px;
     }
 
     form {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
     .form-group label {
@@ -111,12 +106,12 @@
       color: var(--text-secondary);
     }
 
-    .form-group input {
+    .form-group input, .form-group select {
       width: 100%;
       background-color: var(--bg-input);
       border: 1px solid var(--border-input);
       color: var(--text-primary);
-      padding: 10px 12px;
+      padding: 8px 12px;
       border-radius: 8px;
       outline: none;
     }
@@ -143,7 +138,7 @@
       background-color: var(--btn-bg);
       color: #ffffff;
       border: none;
-      padding: 12px;
+      padding: 10px;
       border-radius: 8px;
       font-weight: 600;
       cursor: pointer;
@@ -158,6 +153,26 @@
       background-color: var(--border-input);
       cursor: not-allowed;
       opacity: 0.6;
+    }
+
+    .btn-secondary {
+      background-color: #64748b;
+      color: #ffffff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+
+    .btn-danger {
+      background-color: #ef4444;
+      color: #ffffff;
+      border: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.8rem;
     }
 
     .links-footer {
@@ -213,12 +228,65 @@
 
     .req-valid { color: #16a34a; }
     .req-invalid { color: #dc2626; }
+
+    /* ESTILOS DEL DASHBOARD DE GASTOS */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-card);
+      padding-bottom: 10px;
+    }
+
+    .total-card {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-card);
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .total-card h3 {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .total-amount {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--btn-bg);
+    }
+
+    .gasto-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--border-card);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      background-color: var(--bg-input);
+    }
+
+    .gasto-info p {
+      font-size: 0.85rem;
+    }
+
+    .gasto-info small {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+    }
+
+    .gasto-actions {
+      display: flex;
+      gap: 6px;
+    }
   </style>
 </head>
 <body>
 
   <main class="card-container">
-    <!-- BOTÓN DE CAMBIO DE TEMA -->
     <button id="themeToggle" class="theme-toggle-btn" type="button">🌙 Modo Oscuro</button>
 
     <div id="mensajeResultado" class="message hidden"></div>
@@ -337,6 +405,57 @@
       </form>
       <div class="links-footer">
         <a href="#" class="linkToLogin">Volver al Inicio de Sesión</a>
+      </div>
+    </section>
+
+    <!-- 4. DASHBOARD DE GASTOS (RF-05 AL RF-09) -->
+    <section id="dashboardSection" class="hidden">
+      <div class="dashboard-header">
+        <span id="welcomeUser">Hola, Usuario</span>
+        <button id="btnLogout" class="btn-secondary">Cerrar Sesión</button>
+      </div>
+
+      <!-- RF-09: PANEL DE RESUMEN (DASHBOARD) -->
+      <div class="total-card">
+        <h3>Total Gastado</h3>
+        <div id="totalGastado" class="total-amount">$0.00</div>
+      </div>
+
+      <!-- RF-05 / RF-07: FORMULARIO DE CARGA/EDICIÓN DE GASTO -->
+      <form id="gastoForm">
+        <input type="hidden" id="gastoId">
+        <div class="form-group">
+          <label for="gastoMonto">Monto ($)</label>
+          <input type="number" step="0.01" id="gastoMonto" placeholder="0.00" required>
+        </div>
+        <div class="form-group">
+          <label for="gastoFecha">Fecha</label>
+          <input type="date" id="gastoFecha" required>
+        </div>
+        <div class="form-group">
+          <label for="gastoCategoria">Categoría</label>
+          <select id="gastoCategoria" required>
+            <option value="">Seleccione una categoría</option>
+            <option value="Comida">Comida</option>
+            <option value="Transporte">Transporte</option>
+            <option value="Servicios">Servicios</option>
+            <option value="Entretenimiento">Entretenimiento</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="gastoDescripcion">Descripción</label>
+          <input type="text" id="gastoDescripcion" placeholder="Detalle del gasto" required>
+        </div>
+
+        <button type="submit" id="btnGastoSubmit" class="btn-primary">Añadir Gasto</button>
+        <button type="button" id="btnCancelEdit" class="btn-secondary hidden">Cancelar Edición</button>
+      </form>
+
+      <!-- RF-06: HISTORIAL DINÁMICO -->
+      <div style="margin-top: 16px;">
+        <h3>Historial de Gastos</h3>
+        <div id="listaGastos" style="margin-top: 8px;"></div>
       </div>
     </section>
   </main>
