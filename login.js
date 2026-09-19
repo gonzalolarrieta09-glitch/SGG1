@@ -18,98 +18,100 @@ if (!localStorage.getItem("cuentasSGG")) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Componentes del DOM Globales
+  // Componentes DOM
   const themeToggle = document.getElementById("themeToggle");
   const mensajeDiv = document.getElementById("mensajeResultado");
   const togglePasswordButtons = document.querySelectorAll(".toggle-password-btn");
 
-  // Componentes de Secciones Unificadas
   const loginSection = document.getElementById("loginSection");
   const registerSection = document.getElementById("registerSection");
   const recoverSection = document.getElementById("recoverSection");
 
-  // Enlaces de Navegación Interna
   const linkToRegister = document.getElementById("linkToRegister");
   const linkToRecover = document.getElementById("linkToRecover");
   const linksToLogin = document.querySelectorAll(".linkToLogin");
 
-  // Formularios independientes
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
   const recoverForm = document.getElementById("recoverForm");
 
-  // ---- RF-02: CONTROL DE TEMA PERSISTENTE ----
-  if (localStorage.getItem("tema") === "oscuro") {
-    document.body.classList.add("dark-mode");
-    if (themeToggle) themeToggle.textContent = "🌼 Tema claro";
+  // ---- CONTROL DE TEMA ----
+  function aplicarTema(esOscuro) {
+    if (esOscuro) {
+      document.body.classList.add("dark-mode");
+      if (themeToggle) themeToggle.textContent = "☀️ Modo Claro";
+      localStorage.setItem("tema", "oscuro");
+    } else {
+      document.body.classList.remove("dark-mode");
+      if (themeToggle) themeToggle.textContent = "🌙 Modo Oscuro";
+      localStorage.setItem("tema", "claro");
+    }
   }
+
+  // Cargar tema guardado previamente
+  const temaGuardado = localStorage.getItem("tema");
+  aplicarTema(temaGuardado === "oscuro");
 
   if (themeToggle) {
     themeToggle.addEventListener("click", () => {
-      document.body.classList.toggle("dark-mode");
-      const esOscuro = document.body.classList.contains("dark-mode");
-      localStorage.setItem("tema", esOscuro ? "oscuro" : "claro");
-      themeToggle.textContent = esOscuro ? "🌼 Tema claro" : "🌙 Tema oscuro";
+      const esOscuro = !document.body.classList.contains("dark-mode");
+      aplicarTema(esOscuro);
     });
   }
 
-  // ---- CONTROL UX: BOTÓN DE VER/OCULTAR CONTRASEÑA ----
+  // ---- BOTÓN DE MOSTRAR/OCULTAR CONTRASEÑA ----
   togglePasswordButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       const inputId = btn.getAttribute("data-target");
       const inputField = document.getElementById(inputId);
-      if (inputField.type === "password") {
-        inputField.type = "text";
-        btn.textContent = "🙈";
-        btn.setAttribute("aria-label", "Ocultar contraseña");
-      } else {
-        inputField.type = "password";
-        btn.textContent = "👁️";
-        btn.setAttribute("aria-label", "Mostrar contraseña");
+      if (inputField) {
+        if (inputField.type === "password") {
+          inputField.type = "text";
+          btn.textContent = "🙈";
+        } else {
+          inputField.type = "password";
+          btn.textContent = "👁️";
+        }
       }
     });
   });
 
-  // ---- MOTOR DE NAVEGACIÓN INTERNA (SPA) ----
+  // ---- NAVEGACIÓN SPA ----
   function conmutarVista(vistaDestino) {
     loginSection.classList.add("hidden");
     registerSection.classList.add("hidden");
     recoverSection.classList.add("hidden");
+
     vistaDestino.classList.remove("hidden");
 
-    // Resetear mensajes y formularios al cambiar de pantalla
-    mensajeDiv.textContent = "";
-    mensajeDiv.className = "message";
+    if (mensajeDiv) {
+      mensajeDiv.textContent = "";
+      mensajeDiv.className = "message hidden";
+    }
+
     loginForm.reset();
     registerForm.reset();
     recoverForm.reset();
 
-    // Ocultar listas de requerimientos de nuevo al cambiar de vista
-    document.getElementById("regReqList").classList.add("hidden");
-    document.getElementById("recReqList").classList.add("hidden");
+    const regReqList = document.getElementById("regReqList");
+    const recReqList = document.getElementById("recReqList");
+    if (regReqList) regReqList.classList.add("hidden");
+    if (recReqList) recReqList.classList.add("hidden");
+  }
 
-    // Resetear botones de contraseñas visibles a su estado base
-    document.querySelectorAll('input[type="text"]').forEach((input) => {
-      if (input.id.includes("pass") || input.id.includes("Password")) {
-        input.type = "password";
-      }
-    });
-
-    togglePasswordButtons.forEach((b) => {
-      b.textContent = "👁️";
-      b.setAttribute("aria-label", "Mostrar contraseña");
+  if (linkToRegister) {
+    linkToRegister.addEventListener("click", (e) => {
+      e.preventDefault();
+      conmutarVista(registerSection);
     });
   }
 
-  linkToRegister.addEventListener("click", (e) => {
-    e.preventDefault();
-    conmutarVista(registerSection);
-  });
-
-  linkToRecover.addEventListener("click", (e) => {
-    e.preventDefault();
-    conmutarVista(recoverSection);
-  });
+  if (linkToRecover) {
+    linkToRecover.addEventListener("click", (e) => {
+      e.preventDefault();
+      conmutarVista(recoverSection);
+    });
+  }
 
   linksToLogin.forEach((link) => {
     link.addEventListener("click", (e) => {
@@ -118,7 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ---- VALIDACIÓN DE LAS REGLAS DE CONTRASEÑA ----
+  // ---- REGLAS DE VALIDACIÓN DE CONTRASEÑA ----
   function analizarContrasena(pass) {
     return {
       longitud: pass.length >= 8,
@@ -133,11 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const checks = analizarContrasena(pass);
     const listaContenedora = document.getElementById(`${prefijo}ReqList`);
 
-    // Mostrar u ocultar la lista completa dependiendo de si hay texto ingresado
-    if (pass.length > 0) {
-      listaContenedora.classList.remove("hidden");
-    } else {
-      listaContenedora.classList.add("hidden");
+    if (listaContenedora) {
+      if (pass.length > 0) {
+        listaContenedora.classList.remove("hidden");
+      } else {
+        listaContenedora.classList.add("hidden");
+      }
     }
 
     const procesarItem = (subId, valido, texto) => {
@@ -158,27 +161,55 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnSubmit) btnSubmit.disabled = !todoAprobado;
   }
 
-  // Escuchadores en tiempo real (Feedback UX dinámico)
   const regPassword = document.getElementById("regPassword");
   const btnRegisterSubmit = document.getElementById("btnRegisterSubmit");
-  regPassword.addEventListener("input", () => {
-    refrescarChecklistUX(regPassword.value, "reg", btnRegisterSubmit);
-  });
+  if (regPassword) {
+    regPassword.addEventListener("input", () => {
+      refrescarChecklistUX(regPassword.value, "reg", btnRegisterSubmit);
+    });
+  }
 
   const recPassword = document.getElementById("recPassword");
   const btnRecoverSubmit = document.getElementById("btnRecoverSubmit");
-  recPassword.addEventListener("input", () => {
-    refrescarChecklistUX(recPassword.value, "rec", btnRecoverSubmit);
-  });
+  if (recPassword) {
+    recPassword.addEventListener("input", () => {
+      refrescarChecklistUX(recPassword.value, "rec", btnRecoverSubmit);
+    });
+  }
 
-  // ---- ACCIÓN: INICIO DE SESIÓN (RF-01) ----
+  // ---- ACCIÓN INICIO DE SESIÓN ----
   let intentosFallidos = 0;
-  loginForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const user = document.getElementById("username").value.trim();
-    const pass = document.getElementById("password").value;
-    const db = JSON.parse(localStorage.getItem("cuentasSGG"));
+  if (loginForm) {
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value;
+      const db = JSON.parse(localStorage.getItem("cuentasSGG")) || {};
+      const btnSubmit = document.getElementById("btnLoginSubmit");
 
-    // Aquí continúa la lógica del evento submit...
-  });
+      if (!db[user] || db[user].password !== pass) {
+        intentosFallidos++;
+        mensajeDiv.classList.remove("hidden");
+        if (intentosFallidos >= 3) {
+          btnSubmit.disabled = true;
+          mensajeDiv.textContent = "🚨 Bloqueado por 30 segundos debido a 3 fallos.";
+          mensajeDiv.className = "message error";
+          setTimeout(() => {
+            intentosFallidos = 0;
+            btnSubmit.disabled = false;
+            mensajeDiv.textContent = "🔓 Acceso desbloqueado. Intente nuevamente.";
+            mensajeDiv.className = "message success";
+          }, 30000);
+        } else {
+          mensajeDiv.textContent = `❌ Credenciales incorrectas. Intentos: ${intentosFallidos}/3`;
+          mensajeDiv.className = "message error";
+        }
+      } else {
+        intentosFallidos = 0;
+        mensajeDiv.classList.remove("hidden");
+        mensajeDiv.textContent = "✅ Autenticación correcta. ¡Bienvenido!";
+        mensajeDiv.className = "message success";
+      }
+    });
+  }
 });
