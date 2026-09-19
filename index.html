@@ -20,7 +20,7 @@
 
     /* --- TEMA CLARO (PREDETERMINADO) --- */
     :root {
-      --bg-body: #f1f5f9;         /* Gris claro */
+      --bg-body: #f1f5f9;         /* Gris claro suave */
       --bg-card: #ffffff;         /* Tarjeta blanca */
       --border-card: #e2e8f0;
       --text-primary: #0f172a;    /* Texto oscuro */
@@ -28,12 +28,12 @@
       --text-muted: #64748b;
       --bg-input: #f8fafc;
       --border-input: #cbd5e1;
-      --btn-bg: #d97706;         /* Dorado elegante */
+      --btn-bg: #d97706;         /* Dorado/Ámbar elegante */
       --btn-hover: #b45309;
       --link-color: #d97706;
     }
 
-    /* --- TEMA OSCURO (ACTIVADO SI EL USUARIO LO SELECCIONA) --- */
+    /* --- TEMA OSCURO --- */
     body.dark-mode {
       --bg-body: #0d1117;
       --bg-card: #161b22;
@@ -92,50 +92,6 @@
       font-size: 1.4rem;
       color: var(--text-primary);
       margin-bottom: 8px;
-    }
-
-    p.subtitle {
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    /* BOTONES DE LA PANTALLA INICIAL DE SELECCIÓN DE TEMA */
-    .theme-selection-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .btn-select-theme {
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border-input);
-      font-weight: 600;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.2s;
-    }
-
-    .btn-select-theme:hover {
-      transform: translateY(-2px);
-    }
-
-    .btn-light-option {
-      background-color: #ffffff;
-      color: #0f172a;
-      border-color: #cbd5e1;
-    }
-
-    .btn-dark-option {
-      background-color: #161b22;
-      color: #f8fafc;
-      border-color: #30363d;
     }
 
     form {
@@ -217,6 +173,7 @@
     .links-footer a {
       color: var(--link-color);
       text-decoration: none;
+      cursor: pointer;
     }
 
     .links-footer a:hover {
@@ -261,28 +218,13 @@
 <body>
 
   <main class="card-container">
-    <!-- BOTÓN DE CAMBIO DE TEMA DE CABECERA (APARECE DESPUÉS DE ELEGIR TEMA) -->
-    <button id="themeToggle" class="theme-toggle-btn hidden" type="button">🌙 Modo Oscuro</button>
+    <!-- BOTÓN DE CAMBIO DE TEMA -->
+    <button id="themeToggle" class="theme-toggle-btn" type="button">🌙 Modo Oscuro</button>
 
     <div id="mensajeResultado" class="message hidden"></div>
 
-    <!-- 0. PANTALLA INICIAL: ELECCIÓN DE TEMA -->
-    <section id="selectThemeSection">
-      <h2>Bienvenido al Sistema</h2>
-      <p class="subtitle">Selecciona la apariencia preferida para continuar:</p>
-      
-      <div class="theme-selection-grid">
-        <button id="btnSelectLight" class="btn-select-theme btn-light-option" type="button">
-          ☀️ Modo Claro
-        </button>
-        <button id="btnSelectDark" class="btn-select-theme btn-dark-option" type="button">
-          🌙 Modo Oscuro
-        </button>
-      </div>
-    </section>
-
-    <!-- 1. INICIO DE SESIÓN (OCULTO DE ENTRADA HASTA SELECCIONAR TEMA) -->
-    <section id="loginSection" class="hidden">
+    <!-- 1. INICIO DE SESIÓN -->
+    <section id="loginSection">
       <h2>Iniciar Sesión</h2>
       <form id="loginForm">
         <div class="form-group">
