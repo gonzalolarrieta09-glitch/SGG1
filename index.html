@@ -4,18 +4,195 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistema SGG - Autenticación</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* REGLE CLAVE PARA OCULTAR VISTAS NO ACTIVAS */
+    .hidden {
+      display: none !important;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* CONTENEDOR CENTRAL TIPO TARJETA */
+    .card-container {
+      background-color: #1e293b;
+      width: 100%;
+      max-width: 400px;
+      padding: 28px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* BOTÓN TEMA AMARILLO */
+    .theme-toggle-btn {
+      background-color: #3b82f6;
+      color: #ffffff;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+    }
+
+    .form-group input {
+      width: 100%;
+      background-color: #334155;
+      border: 1px solid #475569;
+      color: #ffffff;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrapper input {
+      padding-right: 36px;
+    }
+
+    .toggle-password-btn {
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* BOTÓN AZUL PRINCIPAL */
+    .btn-primary {
+      background-color: #3b82f6;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .btn-primary:disabled {
+      background-color: #475569;
+      cursor: not-allowed;
+    }
+
+    /* LÍNEA INFERIOR CON ENLACES SEPARADOS */
+    .links-footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    .links-footer a {
+      color: #60a5fa;
+      text-decoration: none;
+    }
+
+    .links-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .separator {
+      color: #475569;
+    }
+
+    /* MENSAJES Y CHECKLIST */
+    .message {
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .message.error {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid #ef4444;
+    }
+
+    .message.success {
+      background-color: rgba(34, 197, 94, 0.2);
+      color: #86efac;
+      border: 1px solid #22c55e;
+    }
+
+    .req-list {
+      list-style: none;
+      font-size: 0.78rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .req-valid { color: #4ade80; }
+    .req-invalid { color: #f87171; }
+  </style>
 </head>
 <body>
 
   <main class="card-container">
-    <!-- BOTÓN DE TEMA EN LA PARTE SUPERIOR -->
+    <!-- BOTÓN SUPERIOR DE TEMA -->
     <button id="themeToggle" class="theme-toggle-btn" type="button">🟡 Tema claro</button>
 
-    <!-- MENSAJE DE RESULTADO -->
+    <!-- ÁREA DE MENSAJES -->
     <div id="mensajeResultado" class="message hidden"></div>
 
-    <!-- 1. SECCIÓN: INICIAR SESIÓN -->
+    <!-- 1. VISTA DE INICIO DE SESIÓN -->
     <section id="loginSection">
       <h2>Iniciar Sesión</h2>
       <form id="loginForm">
@@ -35,7 +212,6 @@
         <button type="submit" id="btnLoginSubmit" class="btn-primary">Ingresar</button>
       </form>
 
-      <!-- ENLACES CON SEPARADOR | -->
       <div class="links-footer">
         <a href="#" id="linkToRegister">Registrar nueva cuenta</a>
         <span class="separator">|</span>
@@ -43,7 +219,7 @@
       </div>
     </section>
 
-    <!-- 2. SECCIÓN: REGISTRO -->
+    <!-- 2. VISTA DE REGISTRO DE USUARIO (OCULTA POR DEFECTO) -->
     <section id="registerSection" class="hidden">
       <h2>Registro de Usuario</h2>
       <form id="registerForm">
@@ -58,8 +234,18 @@
         </div>
 
         <div class="form-group">
+          <label for="regUser">Usuario</label>
+          <input type="text" id="regUser" placeholder="Nombre de usuario" required>
+        </div>
+
+        <div class="form-group">
           <label for="regEmail">Correo Electrónico</label>
           <input type="email" id="regEmail" placeholder="correo@ejemplo.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="regBirth">Fecha de Nacimiento</label>
+          <input type="date" id="regBirth" required>
         </div>
 
         <div class="form-group">
@@ -68,6 +254,11 @@
             <input type="password" id="regPassword" placeholder="Crea tu contraseña" required>
             <button type="button" class="toggle-password-btn" data-target="regPassword" aria-label="Mostrar contraseña">👁️</button>
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="regPasswordConfirm">Confirmar Contraseña</label>
+          <input type="password" id="regPasswordConfirm" placeholder="Repite la contraseña" required>
         </div>
 
         <ul id="regReqList" class="hidden req-list">
@@ -86,16 +277,31 @@
       </div>
     </section>
 
-    <!-- 3. SECCIÓN: RECUPERAR CONTRASEÑA -->
+    <!-- 3. VISTA DE RECUPERACIÓN (OCULTA POR DEFECTO) -->
     <section id="recoverSection" class="hidden">
       <h2>Recuperar Contraseña</h2>
       <form id="recoverForm">
+        <div class="form-group">
+          <label for="recUser">Usuario</label>
+          <input type="text" id="recUser" placeholder="Nombre de usuario" required>
+        </div>
+
+        <div class="form-group">
+          <label for="recEmail">Correo Electrónico</label>
+          <input type="email" id="recEmail" placeholder="correo@ejemplo.com" required>
+        </div>
+
         <div class="form-group">
           <label for="recPassword">Nueva Contraseña</label>
           <div class="password-wrapper">
             <input type="password" id="recPassword" placeholder="Nueva contraseña" required>
             <button type="button" class="toggle-password-btn" data-target="recPassword" aria-label="Mostrar contraseña">👁️</button>
           </div>
+        </div>
+
+        <div class="form-group">
+          <label for="recPasswordConfirm">Confirmar Nueva Contraseña</label>
+          <input type="password" id="recPasswordConfirm" placeholder="Repite la contraseña" required>
         </div>
 
         <ul id="recReqList" class="hidden req-list">
