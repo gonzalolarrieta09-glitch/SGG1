@@ -1,24 +1,18 @@
 // Base de datos simulada en localStorage
 if (!localStorage.getItem("cuentasSGG")) {
   const cuentasIniciales = {
-    usuario1: {
-      password: "Clave*123",
-      email: "usuario1@empresa.com",
-      nombre: "Juan",
-      apellido: "Perez"
-    },
-    admin: {
-      password: "Admin*2026",
-      email: "admin@corporativo.org",
-      nombre: "Carlos",
-      apellido: "SGG"
-    }
+    usuario1: { password: "Clave*123", email: "usuario1@empresa.com", nombre: "Juan", apellido: "Perez" },
+    admin: { password: "Admin*2026", email: "admin@corporativo.org", nombre: "Carlos", apellido: "SGG" }
   };
   localStorage.setItem("cuentasSGG", JSON.stringify(cuentasIniciales));
 }
 
+if (!localStorage.getItem("gastosSGG")) {
+  localStorage.setItem("gastosSGG", JSON.stringify([]));
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  // Componentes DOM
+  // Componentes DOM Globales
   const themeToggle = document.getElementById("themeToggle");
   const mensajeDiv = document.getElementById("mensajeResultado");
   const togglePasswordButtons = document.querySelectorAll(".toggle-password-btn");
@@ -26,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginSection = document.getElementById("loginSection");
   const registerSection = document.getElementById("registerSection");
   const recoverSection = document.getElementById("recoverSection");
+  const dashboardSection = document.getElementById("dashboardSection");
 
   const linkToRegister = document.getElementById("linkToRegister");
   const linkToRecover = document.getElementById("linkToRecover");
@@ -34,6 +29,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("loginForm");
   const registerForm = document.getElementById("registerForm");
   const recoverForm = document.getElementById("recoverForm");
+
+  // Componentes del Dashboard
+  const gastoForm = document.getElementById("gastoForm");
+  const gastoId = document.getElementById("gastoId");
+  const gastoMonto = document.getElementById("gastoMonto");
+  const gastoFecha = document.getElementById("gastoFecha");
+  const gastoCategoria = document.getElementById("gastoCategoria");
+  const gastoDescripcion = document.getElementById("gastoDescripcion");
+  const btnGastoSubmit = document.getElementById("btnGastoSubmit");
+  const btnCancelEdit = document.getElementById("btnCancelEdit");
+  const listaGastos = document.getElementById("listaGastos");
+  const totalGastadoEl = document.getElementById("totalGastado");
+  const welcomeUser = document.getElementById("welcomeUser");
+  const btnLogout = document.getElementById("btnLogout");
+
+  let usuarioActivo = localStorage.getItem("usuarioActivo") || null;
 
   // ---- CONTROL DE TEMA ----
   function aplicarTema(esOscuro) {
@@ -48,22 +59,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Cargar tema guardado previamente
   const temaGuardado = localStorage.getItem("tema");
   aplicarTema(temaGuardado === "oscuro");
 
   if (themeToggle) {
     themeToggle.addEventListener("click", () => {
-      const esOscuro = !document.body.classList.contains("dark-mode");
-      aplicarTema(esOscuro);
+      aplicarTema(!document.body.classList.contains("dark-mode"));
     });
   }
 
-  // ---- BOTÓN DE MOSTRAR/OCULTAR CONTRASEÑA ----
+  // ---- MOSTRAR/OCULTAR CONTRASEÑA ----
   togglePasswordButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const inputId = btn.getAttribute("data-target");
-      const inputField = document.getElementById(inputId);
+      const inputField = document.getElementById(btn.getAttribute("data-target"));
       if (inputField) {
         if (inputField.type === "password") {
           inputField.type = "text";
@@ -76,11 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ---- NAVEGACIÓN SPA ----
+  // ---- NAVEGACIÓN ENTRE VISTAS ----
   function conmutarVista(vistaDestino) {
     loginSection.classList.add("hidden");
     registerSection.classList.add("hidden");
     recoverSection.classList.add("hidden");
+    dashboardSection.classList.add("hidden");
 
     vistaDestino.classList.remove("hidden");
 
@@ -88,128 +97,178 @@ document.addEventListener("DOMContentLoaded", () => {
       mensajeDiv.textContent = "";
       mensajeDiv.className = "message hidden";
     }
-
-    loginForm.reset();
-    registerForm.reset();
-    recoverForm.reset();
-
-    const regReqList = document.getElementById("regReqList");
-    const recReqList = document.getElementById("recReqList");
-    if (regReqList) regReqList.classList.add("hidden");
-    if (recReqList) recReqList.classList.add("hidden");
   }
 
-  if (linkToRegister) {
-    linkToRegister.addEventListener("click", (e) => {
-      e.preventDefault();
-      conmutarVista(registerSection);
-    });
+  if (linkToRegister) linkToRegister.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(registerSection); });
+  if (linkToRecover) linkToRecover.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(recoverSection); });
+  linksToLogin.forEach((link) => link.addEventListener("click", (e) => { e.preventDefault(); conmutarVista(loginSection); }));
+
+  // =========================================================================
+  // LOGICA CRUD DE GASTOS (RF-05 AL RF-09)
+  // =========================================================================
+
+  function obtenerGastos() {
+    return JSON.parse(localStorage.getItem("gastosSGG")) || [];
   }
 
-  if (linkToRecover) {
-    linkToRecover.addEventListener("click", (e) => {
-      e.preventDefault();
-      conmutarVista(recoverSection);
-    });
+  function guardarGastos(gastos) {
+    localStorage.setItem("gastosSGG", JSON.stringify(gastos));
   }
 
-  linksToLogin.forEach((link) => {
-    link.addEventListener("click", (e) => {
-      e.preventDefault();
-      conmutarVista(loginSection);
-    });
-  });
+  // RF-06: HISTORIAL DINÁMICO & RF-09: DASHBOARD
+  function renderizarDashboard() {
+    if (!usuarioActivo) return;
 
-  // ---- REGLAS DE VALIDACIÓN DE CONTRASEÑA ----
-  function analizarContrasena(pass) {
-    return {
-      longitud: pass.length >= 8,
-      mayuscula: /[A-Z]/.test(pass),
-      minuscula: /[a-z]/.test(pass),
-      numero: /[0-9]/.test(pass),
-      especial: /[^A-Za-z0-9]/.test(pass)
-    };
-  }
+    welcomeUser.textContent = `Hola, ${usuarioActivo}`;
+    const gastos = obtenerGastos();
 
-  function refrescarChecklistUX(pass, prefijo, btnSubmit) {
-    const checks = analizarContrasena(pass);
-    const listaContenedora = document.getElementById(`${prefijo}ReqList`);
+    // Filtrar solo los registros del usuario activo que estén activos (estado === true)
+    const gastosUsuario = gastos.filter(g => g.usuario === usuarioActivo && g.activo === true);
 
-    if (listaContenedora) {
-      if (pass.length > 0) {
-        listaContenedora.classList.remove("hidden");
-      } else {
-        listaContenedora.classList.add("hidden");
-      }
+    // RF-09: Calcular Total Gastado
+    const total = gastosUsuario.reduce((acc, curr) => acc + parseFloat(curr.monto), 0);
+    totalGastadoEl.textContent = `$${total.toFixed(2)}`;
+
+    // RF-06: Renderizar Lista
+    listaGastos.innerHTML = "";
+    if (gastosUsuario.length === 0) {
+      listaGastos.innerHTML = "<p style='text-align:center; font-size:0.85rem; color: var(--text-muted);'>No hay gastos registrados.</p>";
+      return;
     }
 
-    const procesarItem = (subId, valido, texto) => {
-      const el = document.getElementById(`${prefijo}${subId}`);
-      if (el) {
-        el.className = valido ? "req-valid" : "req-invalid";
-        el.textContent = (valido ? "✅ " : "❌ ") + texto;
-      }
-    };
-
-    procesarItem("ReqLen", checks.longitud, "Mínimo 8 caracteres");
-    procesarItem("ReqMay", checks.mayuscula, "Al menos 1 Mayúscula");
-    procesarItem("ReqMin", checks.minuscula, "Al menos 1 Minúscula");
-    procesarItem("ReqNum", checks.numero, "Al menos 1 Número");
-    procesarItem("ReqEsp", checks.especial, "Al menos 1 Carácter especial (!@#$%)");
-
-    const todoAprobado = Object.values(checks).every((v) => v === true);
-    if (btnSubmit) btnSubmit.disabled = !todoAprobado;
-  }
-
-  const regPassword = document.getElementById("regPassword");
-  const btnRegisterSubmit = document.getElementById("btnRegisterSubmit");
-  if (regPassword) {
-    regPassword.addEventListener("input", () => {
-      refrescarChecklistUX(regPassword.value, "reg", btnRegisterSubmit);
+    gastosUsuario.forEach(gasto => {
+      const item = document.createElement("div");
+      item.className = "gasto-item";
+      item.innerHTML = `
+        <div class="gasto-info">
+          <p><strong>${gasto.categoria}:</strong> ${gasto.descripcion}</p>
+          <small>${gasto.fecha} - <strong>$${parseFloat(gasto.monto).toFixed(2)}</strong></small>
+        </div>
+        <div class="gasto-actions">
+          <button class="btn-secondary" onclick="prepararEdicion('${gasto.id}')">✏️</button>
+          <button class="btn-danger" onclick="eliminarGasto('${gasto.id}')">🗑️</button>
+        </div>
+      `;
+      listaGastos.appendChild(item);
     });
   }
 
-  const recPassword = document.getElementById("recPassword");
-  const btnRecoverSubmit = document.getElementById("btnRecoverSubmit");
-  if (recPassword) {
-    recPassword.addEventListener("input", () => {
-      refrescarChecklistUX(recPassword.value, "rec", btnRecoverSubmit);
-    });
-  }
+  // RF-05 & RF-07: CREAR Y EDITAR REGISTRO
+  gastoForm.addEventListener("submit", (e) => {
+    e.preventDefault();
 
-  // ---- ACCIÓN INICIO DE SESIÓN ----
-  let intentosFallidos = 0;
-  if (loginForm) {
-    loginForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value;
-      const db = JSON.parse(localStorage.getItem("cuentasSGG")) || {};
-      const btnSubmit = document.getElementById("btnLoginSubmit");
+    const id = gastoId.value;
+    const monto = gastoMonto.value;
+    const fecha = gastoFecha.value;
+    const categoria = gastoCategoria.value;
+    const descripcion = gastoDescripcion.value.trim();
 
-      if (!db[user] || db[user].password !== pass) {
-        intentosFallidos++;
-        mensajeDiv.classList.remove("hidden");
-        if (intentosFallidos >= 3) {
-          btnSubmit.disabled = true;
-          mensajeDiv.textContent = "🚨 Bloqueado por 30 segundos debido a 3 fallos.";
-          mensajeDiv.className = "message error";
-          setTimeout(() => {
-            intentosFallidos = 0;
-            btnSubmit.disabled = false;
-            mensajeDiv.textContent = "🔓 Acceso desbloqueado. Intente nuevamente.";
-            mensajeDiv.className = "message success";
-          }, 30000);
-        } else {
-          mensajeDiv.textContent = `❌ Credenciales incorrectas. Intentos: ${intentosFallidos}/3`;
-          mensajeDiv.className = "message error";
+    let gastos = obtenerGastos();
+
+    if (id) {
+      // RF-07: UPDATE
+      gastos = gastos.map(g => {
+        if (g.id === id) {
+          return { ...g, monto, fecha, categoria, descripcion };
         }
+        return g;
+      });
+    } else {
+      // RF-05: CREATE
+      const nuevoGasto = {
+        id: Date.now().toString(),
+        usuario: usuarioActivo,
+        monto,
+        fecha,
+        categoria,
+        descripcion,
+        activo: true // Estado para la baja lógica
+      };
+      gastos.push(nuevoGasto);
+    }
+
+    guardarGastos(gastos);
+    resetearFormularioGasto();
+    renderizarDashboard();
+  });
+
+  // RF-07: Cargar Datos en Formulario para Edición
+  window.prepararEdicion = function(id) {
+    const gastos = obtenerGastos();
+    const gasto = gastos.find(g => g.id === id);
+
+    if (gasto) {
+      gastoId.value = gasto.id;
+      gastoMonto.value = gasto.monto;
+      gastoFecha.value = gasto.fecha;
+      gastoCategoria.value = gasto.categoria;
+      gastoDescripcion.value = gasto.descripcion;
+
+      btnGastoSubmit.textContent = "Guardar Cambios";
+      btnCancelEdit.classList.remove("hidden");
+    }
+  };
+
+  btnCancelEdit.addEventListener("click", resetearFormularioGasto);
+
+  function resetearFormularioGasto() {
+    gastoId.value = "";
+    gastoForm.reset();
+    btnGastoSubmit.textContent = "Añadir Gasto";
+    btnCancelEdit.classList.add("hidden");
+  }
+
+  // RF-08: ELIMINACIÓN SEGURA (BAJA LÓGICA)
+  window.eliminarGasto = function(id) {
+    if (confirm("¿Está seguro de que desea eliminar este registro de gasto?")) {
+      let gastos = obtenerGastos();
+      gastos = gastos.map(g => {
+        if (g.id === id) {
+          return { ...g, activo: false }; // Cambio de estado en lugar de delete
+        }
+        return g;
+      });
+      guardarGastos(gastos);
+      renderizarDashboard();
+    }
+  };
+
+  // ---- ACCIÓN INICIO DE SESIÓN CON REDIRECCIÓN AL DASHBOARD ----
+  let intentosFallidos = 0;
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value;
+    const db = JSON.parse(localStorage.getItem("cuentasSGG")) || {};
+
+    if (!db[user] || db[user].password !== pass) {
+      intentosFallidos++;
+      mensajeDiv.classList.remove("hidden");
+      if (intentosFallidos >= 3) {
+        mensajeDiv.textContent = "🚨 Bloqueado por 30 segundos debido a 3 fallos.";
+        mensajeDiv.className = "message error";
       } else {
-        intentosFallidos = 0;
-        mensajeDiv.classList.remove("hidden");
-        mensajeDiv.textContent = "✅ Autenticación correcta. ¡Bienvenido!";
-        mensajeDiv.className = "message success";
+        mensajeDiv.textContent = `❌ Credenciales incorrectas. Intentos: ${intentosFallidos}/3`;
+        mensajeDiv.className = "message error";
       }
-    });
+    } else {
+      intentosFallidos = 0;
+      usuarioActivo = user;
+      localStorage.setItem("usuarioActivo", user);
+      conmutarVista(dashboardSection);
+      renderizarDashboard();
+    }
+  });
+
+  btnLogout.addEventListener("click", () => {
+    usuarioActivo = null;
+    localStorage.removeItem("usuarioActivo");
+    conmutarVista(loginSection);
+  });
+
+  // Si ya hay una sesión activa persistida al recargar la página
+  if (usuarioActivo) {
+    conmutarVista(dashboardSection);
+    renderizarDashboard();
   }
 });
