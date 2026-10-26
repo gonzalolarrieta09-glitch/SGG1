@@ -1,62 +1,82 @@
+// db.js - Inicialización de SQLite con sql.js y OPFS
 let db = null;
 
-// 1. Cargar el archivo .sqlite desde el OPFS si ya existe
-async function loadDbFromOPFS() {
+async function initDatabase() {
+  try {
+    const SQL = await initSqlJs({
+      locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`
+    });
+
+    let savedData = null;
     try {
-        const root = await navigator.storage.getDirectory();
-        const Handle = await root.getFileHandle("Gastos.sqlite");
-        const file = await Handle.getFile();
-        const buffer = await file.arrayBuffer();
-       return new Uint8Array(buffer);
+      const root = await navigator.storage.getDirectory();
+      const handle = await root.getFileHandle("sgg_database.sqlite");
+      const file = await handle.getFile();
+      const buffer = await file.arrayBuffer();
+      savedData = new Uint8Array(buffer);
     } catch (e) {
-    // si el archivo no existe todavia, retornamos null
-    console.log("No se encontró el archivo en OPFS, se creará uno nuevo.");
-    return null;       
+      console.log("No se encontró base de datos previa, se creará una nueva.");
     }
+
+    if (savedData) {
+      db = new SQL.Database(savedData);
+    } else {
+      db = new SQL.Database();
+      crearTablas();
+    }
+
+    window.db = db;
+    console.log("¡Base de datos SQLite conectada con éxito!");
+
+    // Disparar un evento avisando que la BD ya está lista
+    window.dispatchEvent(new Event("dbReady"));
+
+  } catch (err) {
+    console.error("Error al inicializar SQLite:", err);
+  }
 }
-// 2. Guardar el archivo .sqlite en el OPFS
-async function saveDbToOPFS(db) {
-    if (!db) return;
-    const data = db.export(); // Exportar la base de datos a un array binario
+
+function crearTablas() {
+  if (!db) return;
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS usuarios (
+      id_usuario INTEGER PRIMARY KEY AUTOINCREMENT,
+      nombre TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      fecha_registro TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS gastos (
+      id_gasto INTEGER PRIMARY KEY AUTOINCREMENT,
+      id_usuario INTEGER,
+      monto REAL NOT NULL,
+      fecha TEXT NOT NULL,
+      categoria TEXT NOT NULL,
+      descripcion TEXT NOT NULL,
+      estado_activo INTEGER DEFAULT 1,
+      FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
+    );
+  `);
+
+  window.guardarBaseDatos();
+}
+
+window.guardarBaseDatos = async function() {
+  if (!db) return;
+  try {
+    const data = db.export();
     const root = await navigator.storage.getDirectory();
-    const Handle = await root.getFileHandle("Gastos.sqlite", { create: true });
-    const writable = await Handle.createWritable();
+    const handle = await root.getFileHandle("sgg_database.sqlite", { create: true });
+    const writable = await handle.createWritable();
     await writable.write(data);
     await writable.close();
-    console.log("Base de datos guardada en OPFS.");
-}
-//  3. Inicializar SQLite y la estructura de tablas
-async function initDatabase() {
-    try {
-        // inicializar sql.js indicado donde esta el archivo .wasm
-        const SQL = await initSqlJs({ locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}` });
+  } catch (err) {
+    console.error("Error al guardar en OPFS:", err);
+  }
+};
 
-        // intentar recuperar base de datos existente
-        const savedData = await loadDbFromOPFS();
-        if (savedData) {
-            db = new SQL.Database(savedData);
-            console.log("Base de datos cargada desde OPFS.");
-        } else {
-            db = new SQL.Database();
-            // Crear la estructura inicial obligatoria
-            db.run(`
-                CREATE TABLE IF NOT EXISTS movimientos (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    descripcion TEXT NOT NULL,
-                    monto REAL NOT NULL,
-                    tipo_movimiento TEXT CHECK(tipo_movimiento IN ('ingreso', 'egreso')) NOT NULL,
-                    url_comprobante TEXT,
-                    activo INTEGER DEFAULT 1
-                );
-            `);
-            await saveDbToOPFS(db);
-        }
-    } catch (error) {
-        console.error("Error al inicializar la base de datos:", error);
-    }
-}
-
-// Llamar a la inicialización al cargar la página
-window.addEventListener('DOMContentLoaded', () => {
-    initDatabase();
-});
+document.addEventListener("DOMContentLoaded", initDatabase);
