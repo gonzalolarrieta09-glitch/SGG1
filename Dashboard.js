@@ -60,7 +60,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Guardar un nuevo gasto al enviar el formulario
   if (gastoForm) {
-    gastoForm.addEventListener("submit", (e) => {
+      // Guardar un nuevo gasto al enviar el formulario
+  if (gastoForm) {
+    gastoForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       if (!window.db) {
@@ -72,6 +74,47 @@ document.addEventListener("DOMContentLoaded", () => {
       const fecha = document.getElementById("gastoFecha").value;
       const categoria = document.getElementById("gastoCategoria").value;
       const descripcion = document.getElementById("gastoDescripcion").value;
+      const archivoComprobante = document.getElementById("comprobante").files[0];
+      
+      let comprobanteUrl = "";
+
+      // Si el usuario seleccionó un comprobante, lo subimos a la API externa
+      if (archivoComprobante) {
+        const formData = new FormData();
+        formData.append("image", archivoComprobante);
+
+        try {
+          const respuesta = await fetch("URL_DE_TU_API_DE_IMAGENES", {
+            method: "POST",
+            body: formData
+          });
+          const datosRespuesta = await respuesta.json();
+          comprobanteUrl = datosRespuesta.url || datosRespuesta.data.url;
+        } catch (error) {
+          console.error("Error al subir la imagen:", error);
+          alert("Hubo un error al subir el comprobante.");
+          return;
+        }
+      }
+
+      try {
+        const stmt = window.db.prepare(
+          "INSERT INTO gastos (monto, fecha, categoria, descripcion, comprobante, estado_activo) VALUES (?, ?, ?, ?, ?, 1)"
+        );
+        stmt.run([monto, fecha, categoria, descripcion, comprobanteUrl]);
+        stmt.free();
+
+        if (typeof window.guardarBaseDatos === "function") {
+          window.guardarBaseDatos();
+        }
+
+        gastoForm.reset();
+        window.cargarGastos();
+      } catch (error) {
+        console.error("Error al guardar el gasto:", error);
+      }
+    });
+  }
 
       try {
         const stmt = window.db.prepare(
