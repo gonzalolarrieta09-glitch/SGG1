@@ -239,9 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value;
-    const db = JSON.parse(localStorage.getItem("cuentasSGG")) || {};
+    const cuentas = JSON.parse(localStorage.getItem("cuentasSGG")) || {};
 
-    if (!db[user] || db[user].password !== pass) {
+    if (!cuentas[user] || cuentas[user].password !== pass) {
       intentosFallidos++;
       mensajeDiv.classList.remove("hidden");
       if (intentosFallidos >= 3) {
