@@ -1,4 +1,4 @@
-// db.js - Inicialización de SQLite con sql.js y OPFS
+// Declaramos una nueva variable global una unica vez para almacenar la instancia de la base de datos SQLite
 let db = null;
 
 async function initDatabase() {
