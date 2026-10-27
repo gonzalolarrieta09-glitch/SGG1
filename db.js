@@ -1,4 +1,4 @@
-// Declaramos una nueva variable global una unica vez para almacenar la instancia de la base de datos SQLite
+
 let db = null;
 const DB_FILE_NAME = "sgg_database.sqlite";
 
