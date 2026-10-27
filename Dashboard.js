@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = stmt.get();
         const [id_gasto, monto, fecha, categoria, descripcion] = row;
         
-        total += parseFloat(monto);
+        total += parseFloat(monto) || 0;
 
         html += `
           <div class="gasto-item">
