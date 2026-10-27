@@ -1,5 +1,6 @@
 // Declaramos una nueva variable global una unica vez para almacenar la instancia de la base de datos SQLite
 let db = null;
+const DB_FILE_NAME = "sgg_database.sqlite";
 
 async function initDatabase() {
   try {
@@ -9,28 +10,31 @@ async function initDatabase() {
 
     let savedData = null;
     try {
+      if (!navigator.storage || !navigator.storage.getDirectory) {
+        throw new Error("OPFS no está disponible en este navegador.");
+      }
+
       const root = await navigator.storage.getDirectory();
-      const handle = await root.getFileHandle("sgg_database.sqlite");
+      const handle = await root.getFileHandle(DB_FILE_NAME);
       const file = await handle.getFile();
-      const buffer = await file.arrayBuffer();
-      savedData = new Uint8Array(buffer);
+      savedData = new Uint8Array(await file.arrayBuffer());
     } catch (e) {
       console.log("No se encontró base de datos previa, se creará una nueva.");
     }
 
-    if (savedData) {
-      db = new SQL.Database(savedData);
-    } else {
+    try {
+      db = savedData ? new SQL.Database(savedData) : new SQL.Database();
+    } catch (error) {
+      console.warn("La base de datos guardada está corrupta o es inválida. Se recreará una nueva.", error);
       db = new SQL.Database();
-      crearTablas();
     }
 
+    crearTablas();
     window.db = db;
     console.log("¡Base de datos SQLite conectada con éxito!");
 
     // Disparar un evento avisando que la BD ya está lista
     window.dispatchEvent(new Event("dbReady"));
-
   } catch (err) {
     console.error("Error al inicializar SQLite:", err);
   }
@@ -62,7 +66,9 @@ function crearTablas() {
     );
   `);
 
-  window.guardarBaseDatos();
+  if (typeof window.guardarBaseDatos === "function") {
+    window.guardarBaseDatos();
+  }
 }
 
 window.guardarBaseDatos = async function() {
@@ -70,7 +76,7 @@ window.guardarBaseDatos = async function() {
   try {
     const data = db.export();
     const root = await navigator.storage.getDirectory();
-    const handle = await root.getFileHandle("sgg_database.sqlite", { create: true });
+    const handle = await root.getFileHandle(DB_FILE_NAME, { create: true });
     const writable = await handle.createWritable();
     await writable.write(data);
     await writable.close();
