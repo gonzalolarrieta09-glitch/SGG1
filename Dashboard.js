@@ -17,10 +17,28 @@ document.addEventListener("DOMContentLoaded", () => {
       let html = "";
       let total = 0;
 
-      while (stmt.step()) {
+        while (stmt.step()) {
         const row = stmt.get();
         const [id_gasto, monto, fecha, categoria, descripcion] = row;
         
+        // Si no hay monto o categoría válida, saltamos esta fila para que no rompa el diseño
+        if (!monto || !categoria) continue;
+
+        const montoNum = parseFloat(monto) || 0;
+        total += montoNum;
+
+        html += `
+          <div class="gasto-item">
+            <div class="gasto-info">
+              <p><strong>${categoria}:</strong> ${descripcion || ""} (${fecha || ""})</p>
+              <small>$${montoNum.toFixed(2)}</small>
+            </div>
+            <div class="gasto-actions">
+              <button class="btn-danger" type="button" onclick="eliminarGasto(${id_gasto})">Eliminar</button>
+            </div>
+          </div>
+        `;
+      }
         total += parseFloat(monto) || 0;
 
         html += `
