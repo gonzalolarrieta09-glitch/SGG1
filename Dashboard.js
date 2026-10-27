@@ -13,15 +13,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const stmt = window.db.prepare(
         "SELECT id_gasto, monto, fecha, categoria, descripcion FROM gastos WHERE estado_activo = 1 ORDER BY fecha DESC"
       );
-      
+
       let html = "";
       let total = 0;
 
-        while (stmt.step()) {
+      while (stmt.step()) {
         const row = stmt.get();
         const [id_gasto, monto, fecha, categoria, descripcion] = row;
-        
-        // Si no hay monto o categoría válida, saltamos esta fila para que no rompa el diseño
+
         if (!monto || !categoria) continue;
 
         const montoNum = parseFloat(monto) || 0;
@@ -39,20 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `;
       }
-        total += parseFloat(monto) || 0;
 
-        html += `
-          <div class="gasto-item">
-            <div class="gasto-info">
-              <p><strong>${categoria}:</strong> ${descripcion} (${fecha})</p>
-              <small>$${parseFloat(monto).toFixed(2)}</small>
-            </div>
-            <div class="gasto-actions">
-              <button class="btn-danger" type="button" onclick="eliminarGasto(${id_gasto})">Eliminar</button>
-            </div>
-          </div>
-        `;
-      }
       stmt.free();
 
       listaGastos.innerHTML = html || "<p style='font-size: 0.85rem; color: var(--text-muted); text-align: center;'>No hay gastos registrados.</p>";
