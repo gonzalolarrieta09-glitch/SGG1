@@ -50,3 +50,65 @@ function registrarGasto(event) {
   }
 }
 
+function cargarGastos() {
+  if (!window.db) return;
+
+  const id_usuario = 1; 
+  const stmt = window.db.prepare(`
+    SELECT * FROM gastos 
+    WHERE id_usuario = ? AND estado_activo = 1 
+    ORDER BY fecha DESC
+  `);
+  stmt.bind([id_usuario]);
+
+  const listaGastos = document.getElementById("listaGastos");
+  if (!listaGastos) return;
+  
+  listaGastos.innerHTML = "";
+  let total = 0;
+
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    total += row.monto;
+
+    const itemHTML = document.createElement("div");
+    itemHTML.className = "gasto-item";
+    itemHTML.innerHTML = `
+      <div class="gasto-info">
+        <p><strong>${row.categoria}</strong> - $${row.monto.toFixed(2)} (${row.tipo_movimiento})</p>
+        <small>${row.fecha}: ${row.descripcion}</small>
+      </div>
+      <button class="btn-danger" onclick="eliminarGasto(${row.id_gasto})">Eliminar</button>
+    `;
+    listaGastos.appendChild(itemHTML);
+  }
+  stmt.free();
+
+  // Actualizar el total gastado en el dashboard
+  const totalGastadoEl = document.getElementById("totalGastado");
+  if (totalGastadoEl) {
+    totalGastadoEl.textContent = `$${total.toFixed(2)}`;
+  }
+}
+
+function eliminarGasto(id_gasto) {
+  if (!window.db) return;
+
+  try {
+    // Borrado lógico: actualiza el estado_activo a 0 en lugar de hacer DELETE físico
+    window.db.run(`
+      UPDATE gastos 
+      SET estado_activo = 0 
+      WHERE id_gasto = ?
+    `, [id_gasto]);
+
+    if (typeof window.guardarBaseDatos === "function") {
+      window.guardarBaseDatos();
+    }
+
+    cargarGastos();
+    console.log(`Gasto ${id_gasto} marcado como inactivo (borrado lógico) 🗑️`);
+  } catch (err) {
+    console.error("Error al eliminar el gasto:", err);
+  }
+}
