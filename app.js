@@ -1,11 +1,14 @@
 // app.js
 window.addEventListener("dbReady", () => {
   console.log("La base de datos está lista en app.js 🚀");
-  
+
   const formGasto = document.getElementById("gastoForm");
   if (formGasto) {
     formGasto.addEventListener("submit", registrarGasto);
   }
+
+  // Cargar los gastos iniciales al arrancar la app
+  cargarGastos();
 });
 
 function registrarGasto(event) {
@@ -39,7 +42,11 @@ function registrarGasto(event) {
 
     console.log("¡Movimiento registrado con éxito 📊!");
     event.target.reset(); // Limpia el formulario tras registrar
+
+    // 4. Actualizar la interfaz visualmente
+    cargarGastos();
   } catch (err) {
     console.error("Error al registrar el movimiento:", err);
   }
 }
+
