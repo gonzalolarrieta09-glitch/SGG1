@@ -1,12 +1,12 @@
-// app.js (Gestión de Gastos y Gráficos con Chart.js)
+// app.js - Sistema completo de gestión de gastos y gráficos 📊
 
-let miGrafico = null; // Variable global para mantener referencia al gráfico
+let miGrafico = null;
 
 async function registrarGasto(event) {
   event.preventDefault();
 
   if (!window.db) {
-    console.error("La base de datos no está inicializada.");
+    console.error("La base de datos 🗄️ no está inicializada.");
     return;
   }
 
@@ -17,7 +17,7 @@ async function registrarGasto(event) {
   const tipo_movimiento = "Gasto"; 
   const id_usuario = 1; 
 
-  // 1. Subida del comprobante a una API REST externa (Ej: ImgBB) con resiliencia
+  // 1. Subida del comprobante a una API externa (ImgBB)
   let url_comprobante = null;
   const fileInput = document.getElementById('comprobante');
 
@@ -33,15 +33,14 @@ async function registrarGasto(event) {
       const resultado = await response.json();
       if (resultado && resultado.success) {
         url_comprobante = resultado.data.url;
-        console.log("Comprobante subido exitosamente 🖼️:", url_comprobante);
       }
     } catch (err) {
-      console.warn("Fallo de red o error en la API externa. Se registrará el gasto con comprobante NULL ⚠️:", err);
+      console.warn("Fallo en la API externa. Se registrará con comprobante NULL ⚠️:", err);
     }
   }
 
   try {
-    // 2. Ejecutar la inserción en la base de datos SQLite
+    // 2. Inserción en la base de datos SQLite
     window.db.run(`
       INSERT INTO gastos (id_usuario, monto, fecha, categoria, descripcion, tipo_movimiento, url_comprobante, estado_activo)
       VALUES (?, ?, ?, ?, ?, ?, ?, 1)
@@ -52,20 +51,61 @@ async function registrarGasto(event) {
       window.guardarBaseDatos();
     }
 
-    console.log("¡Movimiento registrado con éxito 📊!");
     event.target.reset(); 
     cargarGastos();
   } catch (err) {
-    console.error("Error al registrar el movimiento en la base de datos:", err);
+    console.error("Error al registrar el movimiento:", err);
   }
 }
 
-// 4. Función para cargar y mostrar los gastos (asegúrate de llamar aquí a la actualización del gráfico) 📋
+// 4. Cargar y actualizar registros y gráficos 📈
 function cargarGastos() {
   if (!window.db) return;
 
   // Lógica para mostrar la lista de gastos en tu HTML...
-  // (Aquí va el código que ya tengas para listar los registros)
 
-  // Actualizamos el gráfico cada vez que se cargan los datos 📈
-  obtenerDatosGraf
+  // Actualizamos el gráfico llamando a la consulta de agregación
+  obtenerDatosGrafico();
+}
+
+// 5. Consulta SQL con GROUP BY y SUM para el gráfico 🗄️
+function obtenerDatosGrafico() {
+  if (!window.db) return;
+  const stmt = window.db.prepare("SELECT categoria, SUM(monto) as total FROM gastos GROUP BY categoria");
+  const datos = [];
+  while (stmt.step()) {
+    datos.push(stmt.getAsObject());
+  }
+  stmt.free();
+  renderizarGrafico(datos);
+}
+
+// 6. Renderizar gráfico usando Chart.js 📉
+function renderizarGrafico(datos) {
+  const canvas = document.getElementById('graficoGastos');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  
+  const categorias = datos.map(d => d.categoria);
+  const montos = datos.map(d => d.total);
+
+  if (miGrafico) miGrafico.destroy();
+
+  miGrafico = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: categorias,
+      datasets: [{
+        label: 'Total Gastado ($) 💰',
+        data: montos,
+        backgroundColor: '#36A2EB'
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+}
