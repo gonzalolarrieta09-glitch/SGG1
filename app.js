@@ -1,4 +1,7 @@
-// app.js (Actualización con consumo de API REST para comprobantes)
+// app.js (Gestión de Gastos y Gráficos con Chart.js)
+
+let miGrafico = null; // Variable global para mantener referencia al gráfico
+
 async function registrarGasto(event) {
   event.preventDefault();
 
@@ -23,7 +26,6 @@ async function registrarGasto(event) {
     formData.append("image", fileInput.files[0]);
 
     try {
-      // Reemplaza "TU_API_KEY_AQUI" con tu clave de ImgBB o déjalo simulado
       const response = await fetch("https://api.imgbb.com/1/upload?key=TU_API_KEY_AQUI", {
         method: "POST",
         body: formData
@@ -57,3 +59,13 @@ async function registrarGasto(event) {
     console.error("Error al registrar el movimiento en la base de datos:", err);
   }
 }
+
+// 4. Función para cargar y mostrar los gastos (asegúrate de llamar aquí a la actualización del gráfico) 📋
+function cargarGastos() {
+  if (!window.db) return;
+
+  // Lógica para mostrar la lista de gastos en tu HTML...
+  // (Aquí va el código que ya tengas para listar los registros)
+
+  // Actualizamos el gráfico cada vez que se cargan los datos 📈
+  obtenerDatosGraf
