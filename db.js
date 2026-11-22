@@ -1,4 +1,3 @@
-
 let db = null;
 const DB_FILE_NAME = "sgg_database.sqlite";
 
@@ -61,6 +60,8 @@ function crearTablas() {
       fecha TEXT NOT NULL,
       categoria TEXT NOT NULL,
       descripcion TEXT NOT NULL,
+      tipo_movimiento TEXT NOT NULL,
+      url_comprobante TEXT,
       estado_activo INTEGER DEFAULT 1,
       FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)
     );
